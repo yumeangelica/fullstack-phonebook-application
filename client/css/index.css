@@ -1,0 +1,67 @@
+.notification_green {
+  color: green;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+
+.error_red {
+  color: red;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.deletebtn {
+  height: 35px;
+  padding: 3px;
+  font-size: 12px;
+  margin-left: 5px;
+  border-radius: 4px;
+  border: solid 1px black;
+  background-color: #d48de7;
+}
+
+
+.input-width {
+    max-width: 300px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+.filter-input {
+  margin-left: 5px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  height: 30px;
+  max-width: 300px;
+  border: solid 1px black;
+  border-radius: 10px;
+}
+
+
+.submit-btn {
+  margin-left: 5px;
+  margin-top: 10px;
+  border-radius: 4px;
+  border: solid 1px black;
+  background-color: #ff4dff;
+}
+
+
+
+.tableTdBottomBorder {
+  border-bottom: 1px solid rgb(247, 177, 255);
+}
+
+
+.footer {
+  text-align: center;
+}
