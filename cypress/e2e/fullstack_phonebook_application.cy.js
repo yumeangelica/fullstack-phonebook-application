@@ -6,4 +6,11 @@ describe('fullstack-phonebook-application', () => {
     cy.contains('number:')
     cy.contains('add')
   })
+
+  it('frontend shows filter', () => {
+    cy.visit('https://fullstack-phonebook-application.fly.dev/')
+    cy.contains('Filter shown with')
+    cy.get('input')
+      .should('have.value', '')
+  })
 })
