@@ -12,9 +12,9 @@ describe('<NewPersonsForm />', () => {
     ).container
 
     expect(component).toHaveTextContent('Add a new') // testing to see if NewPersonsForm renders
-    expect(component).toHaveTextContent('name:')
-    expect(component).toHaveTextContent('number:')
-    expect(component).toHaveTextContent('add')
+    expect(component).toHaveTextContent('Name:')
+    expect(component).toHaveTextContent('Number:')
+    expect(component).toHaveTextContent('Add')
   })
 
 })
