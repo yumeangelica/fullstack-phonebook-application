@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import FilteredPersonsShow from './components/FilteredPersonsShow'
@@ -164,9 +163,9 @@ const App = () => {
 
   return (
     <>
-      <div className="container"> {/* container on bootstrapin luokka, joka keskittää sivun sisällön */}
+      <div className="container"> {/* bootstrap class */}
 
-        <h1>Phonebook</h1>
+        <h1 className="text-center">Phonebook</h1>
 
         <NotificationMessage notificationMessage={notificationMessage} errorHappened={errorHappened} />
 
