@@ -1,30 +1,28 @@
-
-// component that renders filtered persons
 import { Button, Table } from 'react-bootstrap'
 
 const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
   return (
-    <>
-      <h2>Numbers</h2>
-      <Table hover>
+    <div className="table-container">
+      <h2 className="table-title">Contacts</h2>
+      <Table hover className="custom-table">
         <thead>
           <tr>
-            <th style={{ width: '40%', borderBottom: '0px'  }}>Name</th>
-            <th style={{ width: '20%', borderBottom: '0px'  }}>Number</th>
-            <th style={{ width: '10%', borderBottom: '0px'  }}></th>
+            <th>Name</th>
+            <th>Number</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {filteredPersons.map(person =>
+          {filteredPersons.map(person => (
             <tr key={String(person.id)}>
-              <td  className="tableTdBottomBorder">{person.name}</td>
-              <td  className="tableTdBottomBorder">{person.number}</td>
-              <td ><Button className="deletebtn" onClick={() => removePerson(person.id)}>delete</Button></td>
+              <td>{person.name}</td>
+              <td>{person.number}</td>
+              <td><Button className="deletebtn" onClick={() => removePerson(person.id)}>delete</Button></td>
             </tr>
-          )}
+          ))}
         </tbody>
       </Table>
-    </>
+    </div>
   )
 }
 
