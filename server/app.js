@@ -22,15 +22,14 @@ app.use(corsHeaders)
 
 app.use(requestLogger)
 
-morgan.token('post-data', (req, res) => { // morgan middleware for logging post requests
-  const body = req.body
-  let data = { name: body.name, number: body.number }
-  return JSON.stringify(data)
+morgan.token('post-data', (request, response) => { // morgan middleware for logging post requests
+  const { name, number } = request.body
+  return JSON.stringify({ name, number })
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'))
 
-app.use('', indexRouter)
+app.use('/', indexRouter)
 app.use('/api', apiRouter)
 
 app.use(unknownEndpoint)
