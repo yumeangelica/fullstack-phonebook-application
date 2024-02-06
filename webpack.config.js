@@ -1,14 +1,14 @@
-const HtmlWebPackPlugin = require('html-webpack-plugin')
-const Dotenv = require('dotenv-webpack')
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   entry: [
-    './client'
+    './client',
   ],
   output: {
     path: `${__dirname}/build`,
     filename: 'main.js',
-    publicPath: '/'
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -16,7 +16,7 @@ module.exports = {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
         },
       },
       {
@@ -36,8 +36,8 @@ module.exports = {
           {
             loader: 'css-loader',
           },
-        ]
-      }
+        ],
+      },
     ],
   },
   resolve: {
@@ -48,10 +48,10 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
-      template: './index.html'
+      template: './index.html',
     }),
     new Dotenv({
       path: './.env',
     }),
   ],
-}
+};
