@@ -9,12 +9,10 @@
     "start": "NODE_ENV=production node index.js",
     "start:test": "NODE_ENV=test node index.js",
     "test": "jest",
-    "test:e2e": "cypress run",
     "eslint": "eslint './**/*.{js,jsx}'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "webpack --mode production",
-    "cypress:open": "cypress open"
+    "build": "webpack --mode production"
   },
   "engines": {
     "node": ">=18.16.0"
@@ -30,7 +28,6 @@
   "license": "MIT",
   "devDependencies": {
     "@flydotio/dockerfile": "^0.5.0",
-    "cypress": "^13.2.0",
     "eslint": "^8.56.0",
     "nodemon": "~3.0.1",
     "xo": "^0.57.0"
