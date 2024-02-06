@@ -5,3 +5,5 @@ stats.json
 .DS_Store
 build
 
+/cypress
+/client
