@@ -27,6 +27,6 @@ personSchema.set('toJSON', { // change _id to id and delete _v from returned obj
   }
 })
 
-const Person = mongoose.model('Person', personSchema) // create model from schema
+const Person = mongoose.model('Person', personSchema)
 
 module.exports = Person

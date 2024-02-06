@@ -20,7 +20,6 @@ if (inProduction) {
 
 app.use(corsHeaders)
 
-
 app.use(requestLogger)
 
 morgan.token('post-data', (req, res) => { // morgan middleware for logging post requests
@@ -29,13 +28,10 @@ morgan.token('post-data', (req, res) => { // morgan middleware for logging post 
   return JSON.stringify(data)
 })
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data')) // loggin post requests
-
-
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'))
 
 app.use('', indexRouter)
 app.use('/api', apiRouter)
-
 
 app.use(unknownEndpoint)
 app.use(errorHandler)

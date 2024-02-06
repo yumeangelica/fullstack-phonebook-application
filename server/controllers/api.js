@@ -1,15 +1,14 @@
 const apiRouter = require('express').Router()
 const Person = require('../models/person')
 
-// event handler for /api/persons route
+// get all persons
 apiRouter.get('/persons', (req, res) => {
   Person.find({}).then(persons => {
     res.json(persons)
   })
 })
 
-
-// show one person by id
+// get a person by id
 apiRouter.get('/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
@@ -22,8 +21,7 @@ apiRouter.get('/persons/:id', (request, response, next) => {
     .catch(error => next(error)) // in case of invalid id, error is passed to the error handler
 })
 
-
-
+// add a new person
 apiRouter.post('/persons', (request, response, next) => {
   const body = request.body
 
@@ -33,7 +31,7 @@ apiRouter.post('/persons', (request, response, next) => {
     })
   }
 
-  const person = new Person({ // create new person
+  const person = new Person({ // new person object
     name: body.name,
     number: body.number
   })
@@ -42,12 +40,9 @@ apiRouter.post('/persons', (request, response, next) => {
     response.json(savedPerson)
   })
     .catch(error => next(error)) // in case of invalid details, error is passed to the error handler
-
 })
 
-
-
-// updating a person's number
+// update a person's number
 apiRouter.put('/persons/:id', (req, res, next) => {
 
   const request_body = req.body
@@ -64,8 +59,7 @@ apiRouter.put('/persons/:id', (req, res, next) => {
     .catch(error => next(error))
 })
 
-
-// deleting a person
+// delete a person
 apiRouter.delete('/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
