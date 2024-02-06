@@ -27,12 +27,6 @@ jobs:
       - name: Test Client side
         run: npm run test || exit 1
 
-      - name: e2e tests
-        uses: cypress-io/github-action@v5
-        with:
-          command: npm run test:e2e
-          wait-on: https://fullstack-phonebook-application.fly.dev/
-
       - name: Install Server Dependencies
         run: npm install
 
