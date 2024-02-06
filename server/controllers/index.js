@@ -1,18 +1,20 @@
-const indexRouter = require('express').Router()
-const Person = require('../models/person') // require person model
+// eslint-disable-next-line new-cap
+const indexRouter = require('express').Router();
+const Person = require('../models/person');
 
-// event handler for / route
-indexRouter.get('/', (req, res) => {
-  res.send('<h1>Phonenumber backend test!</h1>')
-})
+indexRouter.get('/', (request, response) => {
+  response.send('<h1>Welcome to phonebook app back-end!</h1>');
+});
 
-// event handler for /info route
-indexRouter.get('/info', (req, res) => {
-  Person.find({}).then(persons => {
-    const today = new Date()
-    res.send(`<p> Phonebook has info for ${persons.length} people <br> ${today} </p>`)
-  })
-})
+indexRouter.get('/info', async (request, response) => {
+  try {
+    const persons = await Person.find({});
+    const today = new Date();
+    response.send(`<p> Phonebook has info for ${persons.length} people <br> ${today} </p>`);
+  } catch (error) {
+    console.log('error', error);
+    response.status(500).json({ error: 'Server error' });
+  }
+});
 
-
-module.exports = indexRouter
+module.exports = indexRouter;

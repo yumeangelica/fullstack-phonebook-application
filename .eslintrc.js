@@ -1,53 +1,48 @@
 module.exports = {
-  'env': {
-    'node': true,
-    'es6': true,
-    'jest/globals': true,
-    'cypress/globals': true
+  env: {
+    commonjs: true,
+    es2021: true,
+    node: true,
+    jest: true,
   },
-  'extends': [
-    'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:react/jsx-runtime'
-  ],
-  'parserOptions': {
-    'ecmaFeatures': {
-      'jsx': true
+  extends: 'xo',
+  overrides: [
+    {
+      env: {
+        node: true,
+      },
+      files: [
+        '.eslintrc.{js,cjs}',
+      ],
+      parserOptions: {
+        sourceType: 'script',
+      },
     },
-    'ecmaVersion': 2018,
-    'sourceType': 'module'
-  },
-  'plugins': [
-    'react', 'jest', 'cypress'
   ],
-  'rules': {
-    'indent': [
-      'error',
-      2
-    ],
-    'linebreak-style': [
-      'error',
-      'unix'
-    ],
-    'quotes': [
-      'warn',
-      'single'
-    ],
-    'semi': [
-      'error',
-      'never'
-    ],
-    'eqeqeq': 'error',
-    'no-undef': 'warn',
-    'no-unused-vars': 'warn',
-    'no-trailing-spaces': 'error',
-    'object-curly-spacing': [
-      'error', 'always'
-    ],
+  parserOptions: {
+    ecmaVersion: 'latest',
+  },
+  rules: {
+    indent: ['error', 2],
+    eqeqeq: ['error', 'always'],
+    'object-curly-spacing': ['error', 'always'],
+    'block-spacing': ['error', 'always'],
     'arrow-spacing': [
-      'error', { 'before': true, 'after': true }
+      'error', { before: true, after: true },
     ],
-    'no-console': 'off',
-    'react/prop-types': 0
-  }
-}
+    quotes: ['error', 'single'],
+    semi: ['error', 'always'],
+    'no-trailing-spaces': 'error',
+    'no-console': 0,
+    'capitalized-comments': [
+      'error',
+      'always',
+      {
+        ignorePattern: 'pragma|ignored',
+        ignoreInlineComments: true,
+        ignoreConsecutiveComments: true,
+      },
+    ],
+    complexity: ['warn', { max: 40 }],
+  },
+};
