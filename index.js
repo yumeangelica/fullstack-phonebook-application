@@ -1,6 +1,5 @@
 require('express-async-errors');
 const mongoose = require('mongoose');
-const http = require('http');
 const app = require('./server/app');
 const cors = require('cors');
 const { MONGODB_URI, PORT, ALLOWED_ORIGINS } = require('./server/utils/config');
@@ -20,8 +19,6 @@ const connectToMongoDB = async () => {
 
 connectToMongoDB();
 
-const server = http.createServer(app);
-
-server.listen(PORT, () => {
-  console.log(`Started on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
