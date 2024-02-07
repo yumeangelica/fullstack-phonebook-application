@@ -4,7 +4,7 @@
 
 # What?
 
-This is a fullstack phonebook application. It is a single page application (SPA) that allows the user to add, delete and update phonebook entries. The application is deployed on [fly.io](https://fullstack-phonebook-application.fly.dev/). The application is made with React and Node.js with Express.js. The database is MongoDB. Testing is done with Jest. 
+This is a fullstack phonebook application. It is a single page application (SPA) that allows the user to add, delete and update phonebook entries. The application is made with React and Node.js with Express.js. The database is MongoDB. Testing is done with Jest. 
 
 The folder structure is as follows:
 #### root ####
@@ -23,7 +23,7 @@ index.js
 components/
   Filter.js
   FilteredPersonsShow.js
-  FilteredPersonsShos.test.js
+  FilteredPersonsShow.test.js
   Footer.js
   NewPersonForm.js
   NewPersonForm.test.js
@@ -39,13 +39,13 @@ services/
 <pre>
 app.js
 controllers/
-  api.js
-  index.js
+  apiController.js
+  indexController.js
 middleware/
-  headers.js
+  corsHeaders.js
   index.js
 models/
-  person.js
+  personModel.js
 utils/
   config.js
 </pre>
