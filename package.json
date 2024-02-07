@@ -13,8 +13,7 @@
     "eslint": "eslint './**/*.{js,jsx}'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "webpack --mode production",
-    "cypress:open": "cypress open"
+    "build": "webpack --mode production"
   },
   "engines": {
     "node": ">=18.16.0"
