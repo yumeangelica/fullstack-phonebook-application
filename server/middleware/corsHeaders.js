@@ -1,6 +1,7 @@
 const { ALLOWED_ORIGINS } = require('../utils/config');
 
-const corsHeaders = (_request, response, next) => { // Cors middleware, that allows cross origin resource sharing
+// Cors middleware, that allows cross origin resource sharing
+const corsHeaders = (_request, response, next) => {
   response.header('Access-Control-Allow-Origin', ALLOWED_ORIGINS);
   response.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Accept');
   response.header('Content-Type', 'application/json');
