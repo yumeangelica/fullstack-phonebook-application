@@ -1,6 +1,6 @@
 // eslint-disable-next-line new-cap
 const indexRouter = require('express').Router();
-const Person = require('../models/person');
+const Person = require('../models/personModel');
 
 indexRouter.get('/', (request, response) => {
   response.send('<h1>Welcome to phonebook app back-end!</h1>');

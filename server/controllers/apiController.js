@@ -1,5 +1,6 @@
+// eslint-disable-next-line new-cap
 const apiRouter = require('express').Router();
-const Person = require('../models/person');
+const Person = require('../models/personModel');
 
 // Get all persons
 apiRouter.get('/persons', async (request, response) => {
@@ -7,6 +8,7 @@ apiRouter.get('/persons', async (request, response) => {
     const persons = await Person.find({});
     response.json(persons);
   } catch (error) {
+    console.log('error', error);
     response.status(500).json({ error: 'internal server error' });
   }
 });
