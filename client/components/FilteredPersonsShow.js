@@ -7,7 +7,8 @@ const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
       <Table hover className="custom-table">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>First name</th>
+            <th>Last name</th>
             <th>Number</th>
             <th>Action</th>
           </tr>
@@ -15,7 +16,8 @@ const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
         <tbody>
           {filteredPersons.map(person => (
             <tr key={String(person.id)}>
-              <td>{person.name}</td>
+              <td>{person.firstName}</td>
+              <td>{person.lastName}</td>
               <td>{person.number}</td>
               <td><Button className="deletebtn" onClick={() => removePerson(person.id)}>delete</Button></td>
             </tr>

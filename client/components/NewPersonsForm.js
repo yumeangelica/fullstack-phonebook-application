@@ -1,6 +1,6 @@
-import { Form, Button } from 'react-bootstrap'
+import { Form, Button } from 'react-bootstrap';
 
-const NewPersonForm = ({ newName, newNumber, addName, handleNameChange, handleNumberChange }) => {
+const NewPersonForm = ({ newFirstName, newLastName, newNumber, addName, handleFirstNameChange, handleLastNameChange, handleNumberChange }) => {
   return (
     <div className="form-container">
       <div className="form-content">
@@ -8,22 +8,25 @@ const NewPersonForm = ({ newName, newNumber, addName, handleNameChange, handleNu
         <Form onSubmit={addName} className="new-person-form">
           <Form.Group>
 
-            <Form.Label className="form-label">
-              Name:
-            </Form.Label>
-
+            <Form.Label className="form-label">First Name:</Form.Label>
             <Form.Control
               type="text"
-              name="name"
-              value={newName}
-              onChange={handleNameChange}
+              name="firstName"
+              value={newFirstName}
+              onChange={handleFirstNameChange}
               className="form-input"
             />
 
-            <Form.Label className="form-label">
-              Number:
-            </Form.Label>
+            <Form.Label className="form-label">Last Name:</Form.Label>
+            <Form.Control
+              type="text"
+              name="lastName"
+              value={newLastName}
+              onChange={handleLastNameChange}
+              className="form-input"
+            />
 
+            <Form.Label className="form-label">Number:</Form.Label>
             <Form.Control
               type="text"
               name="number"
@@ -38,7 +41,7 @@ const NewPersonForm = ({ newName, newNumber, addName, handleNameChange, handleNu
         </Form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NewPersonForm
+export default NewPersonForm;
