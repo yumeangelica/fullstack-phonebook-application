@@ -19,7 +19,7 @@ const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
               <td>{person.firstName}</td>
               <td>{person.lastName}</td>
               <td>{person.number}</td>
-              <td><Button className="deletebtn" onClick={() => removePerson(person.id)}>delete</Button></td>
+              <td><Button className="actionbtn" onClick={() => removePerson(person.id)}>delete</Button></td>
             </tr>
           ))}
         </tbody>
