@@ -9,17 +9,26 @@ h1 {
 }
 
 .notification_green, .error_red {
-  background: #fce1e1;
-  color: #a28089;
+  color: #a28089; /* Keeps the text color consistent with theme */
   font-size: 18px;
-  border: 2px dashed #f9c5d5;
   border-radius: 15px;
   padding: 10px;
   margin-bottom: 10px;
-  box-shadow: 0px 4px 8px rgba(252, 182, 193, 0.5);
+  box-shadow: 0px 4px 8px rgba(252, 182, 193, 0.5); /* Soft shadow for depth */
 }
 
-.deletebtn, .submit-btn {
+.notification_green {
+  background: #cff4d2; /* A softer, pastel green */
+  border: 2px dashed #a3e4b7; /* A pastel green border that complements the background */
+}
+
+.error_red {
+  background: #fcdede; /* A softer, pastel red */
+  border: 2px dashed #f9b2b2; /* A pastel red border that complements the background */
+}
+
+
+.actionbtn, .submit-btn {
   font-size: 14px;
   border-radius: 15px;
   border: none;
@@ -31,7 +40,7 @@ h1 {
   transition: all 0.3s ease;
 }
 
-.deletebtn:hover, .submit-btn:hover {
+.actionbtn:hover, .submit-btn:hover {
   background-color: #f6a6b8;
 }
 
@@ -160,7 +169,7 @@ h1 {
     display: none;
   }
 
-  .deletebtn {
+  .actionbtn {
     padding: 5px 10px;
     font-size: 0.8rem;
     margin: 5px auto;
@@ -226,7 +235,7 @@ h1 {
   text-align: center;
 }
 
-.deletebtn {
+.actionbtn {
   background-color: #f6a6b8;
   color: white;
   border-radius: 5px;
@@ -234,6 +243,6 @@ h1 {
   padding: 5px 10px;
 }
 
-.deletebtn:hover {
+.actionbtn:hover {
   background-color: #e892a5;
 }
