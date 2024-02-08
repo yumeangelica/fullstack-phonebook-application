@@ -1,38 +1,52 @@
-// axios calls are in services/api.js
+import axios from 'axios';
 
-import axios from 'axios'
+const baseURL = '/api';
+const personsEndpoint = '/persons';
 
-const api = '/api' // api path, addition to baseurl
-const persons = '/persons' // persons path in api, addition to baseUrl + api
+const axiosClient = axios.create({
+  baseURL: baseURL,
+});
 
+const getAllPersons = async () => {
+  try {
+    const response = await axiosClient.get(personsEndpoint);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 
-const axiosClient = axios.create({ // axios client
-  baseURL: api
-})
+const createPerson = async (newPerson) => {
+  try {
+    const response = await axiosClient.post(personsEndpoint, newPerson);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 
-const getAllPersons = () => { // get all persons from database
-  return axiosClient.get(persons)
-}
+const updatePerson = async (id, updatedDetails) => {
+  try {
+    const response = await axiosClient.put(`${personsEndpoint}/${id}`, updatedDetails);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 
-const createPerson = (newPerson) => { // create new person
-  return axiosClient.post(persons, newPerson)
-}
+const removePerson = async (id) => {
+  try {
+    const response = await axiosClient.delete(`${personsEndpoint}/${id}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 
-const updatePerson = (id, newNumber) => { // update person's number by id
-  return axiosClient.put(`${persons}/${id}`, newNumber)
-}
-
-const removePerson = (id) => { // remove person from database by id
-  return axiosClient.delete(`${persons}/${id}`)
-}
-
-export const apiService = {
+export default {
   getAllPersons,
   createPerson,
   updatePerson,
-  removePerson
-}
-
-
-export default apiService
+  removePerson,
+};
 
