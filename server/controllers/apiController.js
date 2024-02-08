@@ -29,16 +29,17 @@ apiRouter.get('/persons/:id', async (request, response, next) => {
 
 // Add a new person
 apiRouter.post('/persons', async (request, response, next) => {
-  const { name, number } = request.body;
+  const { firstName, lastName, number } = request.body;
 
-  if (!name || !number) {
+  if (!firstName || !lastName || !number) {
     return response.status(400).json({
-      error: 'name or number missing',
+      error: 'firstName, lastName, or number missing',
     });
   }
 
   const person = new Person({
-    name,
+    firstName,
+    lastName,
     number,
   });
 
@@ -52,12 +53,27 @@ apiRouter.post('/persons', async (request, response, next) => {
 
 // Update a person's number
 apiRouter.put('/persons/:id', async (request, response, next) => {
-  const { name, number } = request.body;
+  const { firstName, lastName, number } = request.body;
+
+  // Initialize the update object
+  const updateData = {};
+
+  if (firstName) {
+    updateData.firstName = firstName;
+  }
+
+  if (lastName) {
+    updateData.lastName = lastName;
+  }
+
+  if (number) {
+    updateData.number = number;
+  }
 
   try {
     const updatedPerson = await Person.findByIdAndUpdate(
       request.params.id,
-      { name, number },
+      updateData,
       { new: true, runValidators: true, context: 'query' },
     );
     if (updatedPerson) {
@@ -73,9 +89,14 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
 // Delete a person
 apiRouter.delete('/persons/:id', async (request, response, next) => {
   try {
-    await Person.findByIdAndRemove(request.params.id);
-    response.status(204).end();
+    const deletedPerson = await Person.findByIdAndDelete(request.params.id);
+    if (deletedPerson) {
+      response.status(204).end();
+    } else {
+      response.status(404).send({ error: 'person not found' });
+    }
   } catch (error) {
+    console.error(error);
     next(error);
   }
 });
