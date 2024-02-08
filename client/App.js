@@ -5,6 +5,7 @@ import NewPersonForm from './components/NewPersonsForm';
 import NotificationMessage from './components/NotificationMessage';
 import apiService from './services/api';
 import Footer from './components/Footer';
+import { Button } from 'react-bootstrap'
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -14,6 +15,7 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('');
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [errorHappened, setErrorHappened] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false); // State for form visibility
 
   useEffect(() => {
     const fetchPersons = async () => {
@@ -84,21 +86,31 @@ const App = () => {
     person.number.includes(newFilter)
   );
 
+  const toggleFormVisibility = () => setIsFormVisible(!isFormVisible); // Toggle form visibility
+
   return (
     <>
       <div className="container">
         <h1 className="text-center">Phonebook</h1>
         <NotificationMessage notificationMessage={notificationMessage} errorHappened={errorHappened} />
         <Filter handleFilterChange={(e) => setNewFilter(e.target.value)} newFilter={newFilter} />
-        <NewPersonForm
-          newFirstName={newFirstName}
-          newLastName={newLastName}
-          newNumber={newNumber}
-          addName={handleAddName}
-          handleFirstNameChange={(e) => setNewFirstName(e.target.value)}
-          handleLastNameChange={(e) => setNewLastName(e.target.value)}
-          handleNumberChange={(e) => setNewNumber(e.target.value)}
-        />
+
+        <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
+           <Button className="actionbtn" onClick={toggleFormVisibility}>{isFormVisible ? 'Close new person form' : 'Add new person & number'}</Button> {/* Toggle button */}
+        </div>
+
+        {isFormVisible && (
+          <NewPersonForm
+            newFirstName={newFirstName}
+            newLastName={newLastName}
+            newNumber={newNumber}
+            addName={handleAddName}
+            handleFirstNameChange={(e) => setNewFirstName(e.target.value)}
+            handleLastNameChange={(e) => setNewLastName(e.target.value)}
+            handleNumberChange={(e) => setNewNumber(e.target.value)}
+          />
+        )}
+
         <FilteredPersonsShow filteredPersons={filteredPersons} removePerson={handleRemovePerson} />
         <Footer />
       </div>
