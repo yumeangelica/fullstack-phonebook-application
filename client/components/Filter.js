@@ -9,28 +9,34 @@ const Filter = ({ handleFilterChange, newFilter }) => {
   return (
     <div className="filter-container">
       <div className="filter-content">
-        <Form.Group>
-          <Form.Label className="filter-label">Filter shown with</Form.Label>
+        <Form.Group controlId="filterInput">
+          <Form.Label className="filter-label">
+            Filter contacts
+          </Form.Label>
           <div className="filter-input-wrapper">
             <Form.Control
-              id="filterInput"
               type="text"
               className="filter-input"
               onChange={handleFilterChange}
               value={newFilter}
-              placeholder="Enter name or number"
+              placeholder="Search by name or phone number..."
+              aria-describedby="filter-help"
             />
             {newFilter && (
               <button
                 type="button"
                 className="filter-clear-btn"
                 onClick={clearFilter}
-                aria-label="Clear filter"
+                aria-label="Clear search filter"
+                title="Clear filter"
               >
                 ×
               </button>
             )}
           </div>
+          <Form.Text id="filter-help" className="text-muted" style={{ fontSize: '13px', marginTop: '8px' }}>
+            {newFilter ? `Showing results for "${newFilter}"` : 'Type to search through your contacts'}
+          </Form.Text>
         </Form.Group>
       </div>
     </div>

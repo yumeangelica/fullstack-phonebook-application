@@ -1,6 +1,6 @@
 {
   "name": "fullstack-phonebook-application",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "A modern phonebook application with real-time validation, international phone number support, and comprehensive testing. Originally created for Full Stack Open 2023, modernized in 2025.",
   "main": "index.js",
   "scripts": {
