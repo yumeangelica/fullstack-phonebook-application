@@ -50,10 +50,10 @@ jobs:
           echo "TEST_MONGODB_URI is set: $([ -n "$TEST_MONGODB_URI" ] && echo "yes" || echo "no")"
 
       - name: Run frontend tests
-        run: npm run test
+        run: npm run test:frontend
 
       - name: Run backend tests
-        run: npm run test:server
+        run: npm run test:backend
 
       - name: Build application
         run: npm run build
