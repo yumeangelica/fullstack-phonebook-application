@@ -8,9 +8,16 @@ beforeAll(async () => {
   originalNodeEnv = process.env.NODE_ENV;
   process.env.NODE_ENV = 'test';
 
-  // Connect to MongoDB using the same URI from .env
+  // Use TEST_MONGODB_URI if available, otherwise fall back to MONGODB_URI
+  const mongoUri = process.env.TEST_MONGODB_URI || process.env.MONGODB_URI;
+
+  if (!mongoUri) {
+    throw new Error('TEST_MONGODB_URI or MONGODB_URI environment variable is required for tests');
+  }
+
+  // Connect to MongoDB using the test URI
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(process.env.MONGODB_URI, {
+    await mongoose.connect(mongoUri, {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
