@@ -1,3 +1,4 @@
+import React from 'react'
 import { Button, Table } from 'react-bootstrap'
 
 const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
@@ -16,10 +17,10 @@ const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
         <tbody>
           {filteredPersons.map(person => (
             <tr key={String(person.id)}>
-              <td>{person.firstName}</td>
-              <td>{person.lastName}</td>
-              <td>{person.number}</td>
-              <td><Button className="actionbtn" onClick={() => removePerson(person.id)}>delete</Button></td>
+              <td data-label="First name">{person.firstName}</td>
+              <td data-label="Last name">{person.lastName}</td>
+              <td data-label="Number">{person.number}</td>
+              <td data-label="Action"><Button className="actionbtn" onClick={() => removePerson(person.id)}>delete</Button></td>
             </tr>
           ))}
         </tbody>
