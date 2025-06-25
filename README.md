@@ -1,72 +1,117 @@
-# Fullstack Phonebook Application #
+# Fullstack Phonebook Application
 
-#### https://fullstack-phonebook-application.fly.dev/ ####
+A modern phonebook application with real-time validation, international phone number support, and comprehensive testing. Built with React, Node.js, Express, and MongoDB.
 
-# What?
+Originally created for the Full Stack Open course in 2023, significantly modernized and enhanced in 2025 with improved architecture, validation, testing, and production-ready features.
 
-This is a fullstack phonebook application. It is a single page application (SPA) that allows the user to add, delete and update phonebook entries. The application is made with React and Node.js with Express.js. The database is MongoDB. Testing is done with Jest. 
+## Features
 
-The folder structure is as follows:
-#### root ####
-<pre>
-index.html
-index.js
-client/
-server/
-...
-</pre>
+- Add, edit, delete, and search contacts
+- Real-time form validation with visual feedback
+- International phone number validation with country codes
+- Finnish phone number normalization (removes leading zero)
+- Responsive design for desktop and mobile
+- Search and filter functionality
+- Pagination for large contact lists
+- Comprehensive error handling
 
-#### client (frontend) ####
-<pre>
-App.js
-index.js
-components/
-  Filter.js
-  FilteredPersonsShow.js
-  FilteredPersonsShow.test.js
-  Footer.js
-  NewPersonForm.js
-  NewPersonForm.test.js
-  NotificationMessage.js
-css/
-  App.css
-  index.css
-services/
-  api.js
-</pre>
+## Tech Stack
 
-#### server (backend) ####
-<pre>
-app.js
-controllers/
-  apiController.js
-  indexController.js
-middleware/
-  corsHeaders.js
-  index.js
-models/
-  personModel.js
-utils/
-  config.js
-</pre>
+**Frontend:** React, React Bootstrap, Webpack, libphonenumber-js
+**Backend:** Node.js, Express.js, MongoDB, Mongoose
+**Testing:** Jest for both frontend and backend
+**Development:** Nodemon, Concurrently, ESLint
 
+## Quick Start
 
-## root files ##
+### Prerequisites
 
+- Node.js >= 20.18.0
+- npm
+- MongoDB (local or MongoDB Atlas)
 
-#### index.html ####
+### Installation
 
-This is the template that will be turned to the html loaded by the browser first. 
+```bash
+git clone <repository-url>
+cd fullstack-phonebook-application
+npm install
+```
 
-#### index.js ####
+### Environment Setup
 
-This is the entrypoint when starting the application.
+Create `.env` file:
 
-#### package.json ####
+```
+MONGODB_URI=your-mongodb-uri
+TEST_MONGODB_URI=your-test-mongodb-uri
+PORT=5001
+```
 
-This file contains the dependencies and scripts for the application.
+### Development
 
-#### webpack.config.js ####
+```bash
+npm run dev
+```
 
-This is the configuration file for webpack. It is used to bundle the application into a single file.
+Frontend: http://localhost:3000
+Backend: http://localhost:5001
 
+### Production
+
+```bash
+npm run build
+npm start
+```
+
+## Scripts
+
+- `npm run dev` - Start development servers
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm test` - Run all tests
+- `npm run test:frontend` - Run React component tests
+- `npm run test:backend` - Run API and model tests
+- `npm run lint` - Run ESLint
+
+## API Endpoints
+
+```
+GET    /api/persons       - Get all contacts (with search/pagination)
+POST   /api/persons       - Create new contact
+GET    /api/persons/:id   - Get specific contact
+PUT    /api/persons/:id   - Update contact
+DELETE /api/persons/:id   - Delete contact
+GET    /api/stats         - Get application statistics
+GET    /health            - Health check
+```
+
+## Validation
+
+**Names:** 3-50 characters, letters/spaces/hyphens/apostrophes only, Unicode support
+**Phone:** International format with country codes, real-world validation using libphonenumber-js
+
+## Project Structure
+
+```
+├── client/              # React frontend
+│   ├── components/      # React components
+│   ├── css/            # Styling
+│   └── services/       # API services
+├── server/             # Express backend
+│   ├── controllers/    # Route handlers
+│   ├── middleware/     # Custom middleware
+│   ├── models/         # Mongoose models
+│   ├── tests/          # Test files
+│   └── utils/          # Database utilities
+├── build/              # Production build
+└── index.js           # Server entry point
+```
+
+## Credits
+
+Created by yumeangelica (yumeangelica.github.io)
+
+## License
+
+MIT

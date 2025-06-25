@@ -26,8 +26,9 @@ morgan.token('post-data', (request, response) => { // Morgan middleware for logg
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'));
 
-app.use('/', indexRouter);
 app.use('/api', apiRouter);
+
+app.use('/', indexRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

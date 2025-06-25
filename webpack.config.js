@@ -45,6 +45,16 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
+    port: 3000,
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      },
+    ],
+    open: true,
+    hot: true,
   },
   plugins: [
     new HtmlWebPackPlugin({

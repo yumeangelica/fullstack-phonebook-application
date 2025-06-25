@@ -1,8 +1,14 @@
+import React from 'react';
+import { Alert } from 'react-bootstrap';
+
 const NotificationMessage = ({ notificationMessage, errorHappened }) => {
   return notificationMessage ? (
-    <div className={errorHappened ? "error_red" : "notification_green"}>
+    <Alert
+      variant={errorHappened ? "danger" : "success"}
+      className="notification-alert"
+    >
       {notificationMessage}
-    </div>
+    </Alert>
   ) : null;
 };
 

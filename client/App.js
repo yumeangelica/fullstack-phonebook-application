@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Filter from './components/Filter';
 import FilteredPersonsShow from './components/FilteredPersonsShow';
 import NewPersonForm from './components/NewPersonsForm';
@@ -12,6 +12,7 @@ const App = () => {
   const [newFirstName, setNewFirstName] = useState('');
   const [newLastName, setNewLastName] = useState('');
   const [newNumber, setNewNumber] = useState('');
+  const [newCountryCode, setNewCountryCode] = useState('+358'); // Default to Finland
   const [newFilter, setNewFilter] = useState('');
   const [notificationMessage, setNotificationMessage] = useState(null);
   const [errorHappened, setErrorHappened] = useState(false);
@@ -21,7 +22,8 @@ const App = () => {
     const fetchPersons = async () => {
       try {
         const response = await apiService.getAllPersons();
-        setPersons(response.data);
+        // Backend now returns { persons, pagination }, so extract persons array
+        setPersons(response.data.persons || []);
       } catch (error) {
         console.log('Error fetching persons:', error.message);
       }
@@ -46,9 +48,10 @@ const App = () => {
 
   const handleAddName = async (event) => {
     event.preventDefault();
-    const nameObject = { firstName: newFirstName, lastName: newLastName, number: newNumber };
+    const fullPhoneNumber = `${newCountryCode} ${newNumber}`;
+    const nameObject = { firstName: newFirstName, lastName: newLastName, number: fullPhoneNumber };
     const existingPerson = persons.find(person => person.firstName === newFirstName && person.lastName === newLastName);
-    
+
     try {
       if (existingPerson) {
         const confirmUpdate = window.confirm(`${newFirstName} ${newLastName} is already added to phonebook, replace the old number with a new one?`);
@@ -68,6 +71,7 @@ const App = () => {
       setNewFirstName('');
       setNewLastName('');
       setNewNumber('');
+      setNewCountryCode('+358'); // Reset to default
     }
   };
 
@@ -93,10 +97,10 @@ const App = () => {
       <div className="container">
         <h1 className="text-center">Phonebook</h1>
         <NotificationMessage notificationMessage={notificationMessage} errorHappened={errorHappened} />
-        <Filter handleFilterChange={(e) => setNewFilter(e.target.value)} newFilter={newFilter} />
 
+        <Filter handleFilterChange={(e) => setNewFilter(e.target.value)} newFilter={newFilter} />
         <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
-           <Button className="actionbtn" onClick={toggleFormVisibility}>{isFormVisible ? 'Close new person form' : 'Add new person & number'}</Button> {/* Toggle button */}
+          <Button className="actionbtn" onClick={toggleFormVisibility}>{isFormVisible ? 'Close new person form' : 'Add new person & number'}</Button> {/* Toggle button */}
         </div>
 
         {isFormVisible && (
@@ -104,10 +108,19 @@ const App = () => {
             newFirstName={newFirstName}
             newLastName={newLastName}
             newNumber={newNumber}
+            newCountryCode={newCountryCode}
             addName={handleAddName}
-            handleFirstNameChange={(e) => setNewFirstName(e.target.value)}
-            handleLastNameChange={(e) => setNewLastName(e.target.value)}
-            handleNumberChange={(e) => setNewNumber(e.target.value)}
+            handleFirstNameChange={(e) => setNewFirstName(e.target.value.trim())}
+            handleLastNameChange={(e) => setNewLastName(e.target.value.trim())} handleNumberChange={(e) => {
+              let value = e.target.value.trim();
+              // Finnish number normalization: remove leading zero from mobile numbers
+              // This ensures +358 040123456 becomes +358 40123456 for international compliance
+              if (newCountryCode === '+358' && /^0[4-5]/.test(value)) {
+                value = value.substring(1); // Remove the leading zero
+              }
+              setNewNumber(value);
+            }}
+            handleCountryCodeChange={(e) => setNewCountryCode(e.target.value)}
           />
         )}
 

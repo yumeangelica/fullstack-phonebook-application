@@ -1,0 +1,9 @@
+{
+  "watch": ["server", "index.js"],
+  "ext": "js,json",
+  "ignore": ["node_modules", "client", "build", "cypress"],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": 1000
+}
