@@ -2,7 +2,7 @@
 
 A modern phonebook application with real-time validation, international phone number support, and comprehensive testing. Built with React, Node.js, Express, and MongoDB.
 
-Originally created for the Full Stack Open course in 2023, significantly modernized and enhanced in 2025 with improved architecture, validation, testing, and production-ready features.
+Originally created for the Full Stack Open course in 2023, significantly modernized and enhanced in 2026 with improved architecture, validation, testing, and production-ready features.
 
 ## Features
 
@@ -17,16 +17,16 @@ Originally created for the Full Stack Open course in 2023, significantly moderni
 
 ## Tech Stack
 
-**Frontend:** React, React Bootstrap, Webpack, libphonenumber-js
-**Backend:** Node.js, Express.js, MongoDB, Mongoose
-**Testing:** Jest for both frontend and backend
-**Development:** Nodemon, Concurrently, ESLint
+**Frontend:** React 19, Webpack 5, libphonenumber-js
+**Backend:** Node.js 22, Express 5, MongoDB, Mongoose 9
+**Testing:** Node.js built-in test runner (`node:test`), supertest
+**Development:** Concurrently, ESLint 9 (flat config)
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js >= 20.18.0
+- Node.js >= 20.0.0
 - npm
 - MongoDB (local or MongoDB Atlas)
 
@@ -66,12 +66,13 @@ npm start
 
 ## Scripts
 
-- `npm run dev` - Start development servers
+- `npm run dev` - Start development servers (backend + frontend)
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm test` - Run all tests
 - `npm run test:frontend` - Run React component tests
 - `npm run test:backend` - Run API and model tests
+- `npm run test:watch` - Run backend tests in watch mode
 - `npm run lint` - Run ESLint
 
 ## API Endpoints
@@ -95,17 +96,19 @@ GET    /health            - Health check
 
 ```
 ├── client/              # React frontend
-│   ├── components/      # React components
-│   ├── css/            # Styling
-│   └── services/       # API services
-├── server/             # Express backend
-│   ├── controllers/    # Route handlers
-│   ├── middleware/     # Custom middleware
-│   ├── models/         # Mongoose models
-│   ├── tests/          # Test files
-│   └── utils/          # Database utilities
-├── build/              # Production build
-└── index.js           # Server entry point
+│   ├── components/      # React components with tests
+│   ├── css/             # Styling
+│   ├── services/        # API services (native fetch)
+│   └── test-setup.js    # jsdom setup for frontend tests
+├── server/              # Express backend
+│   ├── controllers/     # Route handlers
+│   ├── middleware/      # Error handling, logging, security
+│   ├── models/          # Mongoose models
+│   ├── tests/           # Backend tests (supertest)
+│   └── utils/           # Config and database utilities
+├── eslint.config.js     # ESLint flat config
+├── index.html           # HTML template
+└── index.js             # Server entry point
 ```
 
 ## Credits

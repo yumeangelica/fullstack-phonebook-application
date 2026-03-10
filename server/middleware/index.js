@@ -1,4 +1,5 @@
-const errorHandler = (error, request, response, next) => {
+// Express requires 4 params to identify error-handling middleware
+const errorHandler = (error, request, response, _next) => {
   console.error(`Error: ${error.message}`);
   console.error(`Stack: ${error.stack}`);
 
@@ -25,7 +26,7 @@ const errorHandler = (error, request, response, next) => {
 
     if (field === 'number') {
       return response.status(409).json({
-        error: `Phone number already exists`
+        error: 'Phone number already exists'
       });
     }
 
@@ -55,27 +56,30 @@ const errorHandler = (error, request, response, next) => {
     error: 'Internal server error',
     ...(process.env.NODE_ENV === 'development' && { details: error.message })
   });
-
-  next(error);
 };
 
-// Enhanced request logging middleware for debugging and monitoring
-const requestLogger = (request, response, next) => {
-  const timestamp = new Date().toISOString();
-  const { method, path, ip } = request;
-  const userAgent = request.get('User-Agent') || 'Unknown';
+// HTTP request logging middleware — replaces morgan + requestLogger
+const httpLogger = (request, response, next) => {
+  const start = Date.now();
 
-  console.log(`[${timestamp}] ${method} ${path} from ${ip}`);
-  console.log(`User-Agent: ${userAgent}`);
+  response.on('finish', () => {
+    const duration = Date.now() - start;
+    const { method, url } = request;
+    const { statusCode } = response;
+    const contentLength = response.get('content-length') || 0;
 
-  if (method === 'POST' || method === 'PUT') {
-    // Log request body for debugging, excluding sensitive data
-    const safeBody = { ...request.body };
-    delete safeBody.password; // Remove password if present
-    console.log('Body:', JSON.stringify(safeBody, null, 2));
-  }
+    let line = `${method} ${url} ${statusCode} ${contentLength} - ${duration}ms`;
 
-  console.log('---');
+    if (method === 'POST' || method === 'PUT') {
+      const body = request.body
+        ? JSON.stringify({ name: request.body.name, number: request.body.number })
+        : '';
+      line += ` ${body}`;
+    }
+
+    console.log(line);
+  });
+
   next();
 };
 
@@ -133,7 +137,7 @@ const securityHeaders = (req, res, next) => {
 module.exports = {
   unknownEndpoint,
   errorHandler,
-  requestLogger,
+  httpLogger,
   createRateLimiter,
   securityHeaders
 };

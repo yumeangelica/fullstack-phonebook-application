@@ -1,5 +1,3 @@
-import React from 'react';
-import { Form, Button } from 'react-bootstrap';
 import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
 
 const NewPersonForm = ({ newFirstName, newLastName, newNumber, newCountryCode, addName, handleFirstNameChange, handleLastNameChange, handleNumberChange, handleCountryCodeChange }) => {
@@ -169,24 +167,23 @@ const NewPersonForm = ({ newFirstName, newLastName, newNumber, newCountryCode, a
     <div className="form-container">
       <div className="form-content">
         <h2 className="form-title">Add a new contact</h2>
-        <Form onSubmit={(e) => {
+        <form onSubmit={(e) => {
           e.preventDefault();
-          // Double-check validation before submitting
           if (isFormValid) {
             addName(e);
           }
         }} className="new-person-form">
-          <Form.Group>
+          <div>
 
-            <Form.Label className="form-label">
+            <label className="form-label">
               First Name:
               {showFirstNameFeedback && (
                 <span className={`validation-icon ${firstNameValidation.isValid ? 'valid' : 'invalid'}`}>
                   {firstNameValidation.isValid ? ' ✓' : ' ✗'}
                 </span>
               )}
-            </Form.Label>
-            <Form.Control
+            </label>
+            <input
               type="text"
               name="firstName"
               value={newFirstName}
@@ -197,15 +194,15 @@ const NewPersonForm = ({ newFirstName, newLastName, newNumber, newCountryCode, a
               <div className="validation-message error">{firstNameValidation.message}</div>
             )}
 
-            <Form.Label className="form-label">
+            <label className="form-label">
               Last Name:
               {showLastNameFeedback && (
                 <span className={`validation-icon ${lastNameValidation.isValid ? 'valid' : 'invalid'}`}>
                   {lastNameValidation.isValid ? ' ✓' : ' ✗'}
                 </span>
               )}
-            </Form.Label>
-            <Form.Control
+            </label>
+            <input
               type="text"
               name="lastName"
               value={newLastName}
@@ -216,9 +213,9 @@ const NewPersonForm = ({ newFirstName, newLastName, newNumber, newCountryCode, a
               <div className="validation-message error">{lastNameValidation.message}</div>
             )}
 
-            <Form.Label className="form-label">Country & Number:</Form.Label>
+            <label className="form-label">Country & Number:</label>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-              <Form.Select
+              <select
                 value={newCountryCode}
                 onChange={handleCountryCodeChange}
                 className="form-input"
@@ -229,10 +226,10 @@ const NewPersonForm = ({ newFirstName, newLastName, newNumber, newCountryCode, a
                     {country.code} {country.country}
                   </option>
                 ))}
-              </Form.Select>
+              </select>
 
               <div style={{ flex: 1 }}>
-                <Form.Control
+                <input
                   type="text"
                   name="number"
                   value={newNumber}
@@ -253,27 +250,25 @@ const NewPersonForm = ({ newFirstName, newLastName, newNumber, newCountryCode, a
             )}
 
             <div className="form-buttons">
-              <Button
-                variant="primary"
+              <button
                 type="submit"
                 className={`submit-btn ${!isFormValid ? 'disabled' : ''}`}
                 disabled={!isFormValid}
               >
                 Add
-              </Button>
+              </button>
 
-              <Button
-                variant="outline-secondary"
+              <button
                 type="button"
                 className="clear-btn"
                 onClick={clearForm}
               >
                 Clear
-              </Button>
+              </button>
             </div>
 
-          </Form.Group>
-        </Form>
+          </div>
+        </form>
       </div>
     </div>
   );

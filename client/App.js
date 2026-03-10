@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Filter from './components/Filter';
 import FilteredPersonsShow from './components/FilteredPersonsShow';
 import NewPersonForm from './components/NewPersonsForm';
 import NotificationMessage from './components/NotificationMessage';
 import apiService from './services/api';
 import Footer from './components/Footer';
-import { Button } from 'react-bootstrap'
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -95,12 +94,12 @@ const App = () => {
   return (
     <>
       <div className="container">
-        <h1 className="text-center">Phonebook</h1>
+        <h1>Phonebook</h1>
         <NotificationMessage notificationMessage={notificationMessage} errorHappened={errorHappened} />
 
         <Filter handleFilterChange={(e) => setNewFilter(e.target.value)} newFilter={newFilter} />
         <div style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
-          <Button className="actionbtn" onClick={toggleFormVisibility}>{isFormVisible ? 'Close new person form' : 'Add new person & number'}</Button> {/* Toggle button */}
+          <button className="actionbtn" onClick={toggleFormVisibility}>{isFormVisible ? 'Close new person form' : 'Add new person & number'}</button>
         </div>
 
         {isFormVisible && (

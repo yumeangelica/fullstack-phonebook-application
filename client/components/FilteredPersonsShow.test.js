@@ -1,37 +1,43 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
+import { act } from 'react';
+import { createRoot } from 'react-dom/client';
+import FilteredPersonsShow from './FilteredPersonsShow';
 
-import React from 'react'
-import '@testing-library/jest-dom'
-import { render } from '@testing-library/react'
-import FilteredPersonsShow from './FilteredPersonsShow'
+describe('<FilteredPersonsShow />', () => {
+  it('renders persons', async () => {
+    const persons = [
+      {
+        firstName: 'miuku',
+        lastName: 'miau',
+        number: '050-4565789',
+        id: '1'
+      },
+      {
+        firstName: 'mauku',
+        lastName: 'miauu',
+        number: '050-9654321',
+        id: '2'
+      }
+    ];
 
-test('renders persons', () => {
-  const persons = [
-    {
-      firstName: 'miuku',
-      lastName: 'miau',
-      number: '050-4565789',
-      id: '1'
-    },
-    {
-      firstName: 'mauku',
-      lastName: 'miauu',
-      number: '050-9654321',
-      id: '2'
-    }
-  ]
+    const container = document.createElement('div');
+    document.body.appendChild(container);
 
-  const mockRemovePerson = jest.fn(); // Mock function for removePerson
+    await act(async () => {
+      createRoot(container).render(
+        <FilteredPersonsShow filteredPersons={persons} removePerson={() => { }} />
+      );
+    });
 
-  const component = render( // Render component and pass test data as props
-    <FilteredPersonsShow filteredPersons={persons} removePerson={mockRemovePerson} />
-  ).container
+    assert.ok(container.textContent.includes(persons[0].firstName));
+    assert.ok(container.textContent.includes(persons[0].lastName));
+    assert.ok(container.textContent.includes(persons[0].number));
+    assert.ok(container.textContent.includes(persons[1].firstName));
+    assert.ok(container.textContent.includes(persons[1].lastName));
+    assert.ok(container.textContent.includes(persons[1].number));
+    assert.ok(container.textContent.includes('delete'));
 
-  expect(component).toHaveTextContent(persons[0].firstName) // Test that persons and numbers are rendered
-  expect(component).toHaveTextContent(persons[0].lastName)
-  expect(component).toHaveTextContent(persons[0].number)
-  expect(component).toHaveTextContent(persons[1].firstName)
-  expect(component).toHaveTextContent(persons[1].lastName)
-  expect(component).toHaveTextContent(persons[1].number)
-  expect(component).toHaveTextContent('delete') // Test that delete button is rendered
-
-})
+    document.body.removeChild(container);
+  });
+});

@@ -1,11 +1,8 @@
-import React from 'react'
-import { Button, Table } from 'react-bootstrap'
-
 const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
   return (
     <div className="table-container">
       <h2 className="table-title">Contacts</h2>
-      <Table hover className="custom-table">
+      <table className="custom-table">
         <thead>
           <tr>
             <th>First name</th>
@@ -20,13 +17,13 @@ const FilteredPersonsShow = ({ filteredPersons, removePerson }) => {
               <td data-label="First name">{person.firstName}</td>
               <td data-label="Last name">{person.lastName}</td>
               <td data-label="Number">{person.number}</td>
-              <td data-label="Action"><Button className="actionbtn" onClick={() => removePerson(person.id)}>delete</Button></td>
+              <td data-label="Action"><button className="actionbtn" onClick={() => removePerson(person.id)}>delete</button></td>
             </tr>
           ))}
         </tbody>
-      </Table>
+      </table>
     </div>
-  )
-}
+  );
+};
 
-export default FilteredPersonsShow
+export default FilteredPersonsShow;

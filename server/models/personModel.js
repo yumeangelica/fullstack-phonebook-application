@@ -66,7 +66,7 @@ const personSchema = new mongoose.Schema({
         // This library handles country-specific rules and formatting requirements
         try {
           return isValidPhoneNumber(v);
-        } catch (error) {
+        } catch (_error) {
           return false;
         }
       },
