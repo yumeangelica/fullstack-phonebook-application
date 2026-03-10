@@ -1,14 +1,6 @@
-require('express-async-errors');
 const app = require('./server/app');
-const cors = require('cors');
-const { MONGODB_URI, PORT, ALLOWED_ORIGINS } = require('./server/utils/config');
+const { MONGODB_URI, PORT } = require('./server/utils/config');
 const { connectToMongoDB } = require('./server/utils/database');
-
-app.use(cors({
-  origin: ALLOWED_ORIGINS,
-  credentials: true,
-  optionsSuccessStatus: 200
-}));
 
 const startServer = async () => {
   try {

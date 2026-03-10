@@ -1,6 +1,3 @@
-import React from 'react';
-import { Form } from 'react-bootstrap';
-
 const Filter = ({ handleFilterChange, newFilter }) => {
   const clearFilter = () => {
     handleFilterChange({ target: { value: '' } });
@@ -9,12 +6,13 @@ const Filter = ({ handleFilterChange, newFilter }) => {
   return (
     <div className="filter-container">
       <div className="filter-content">
-        <Form.Group controlId="filterInput">
-          <Form.Label className="filter-label">
+        <div>
+          <label htmlFor="filterInput" className="filter-label">
             Filter contacts
-          </Form.Label>
+          </label>
           <div className="filter-input-wrapper">
-            <Form.Control
+            <input
+              id="filterInput"
               type="text"
               className="filter-input"
               onChange={handleFilterChange}
@@ -34,10 +32,10 @@ const Filter = ({ handleFilterChange, newFilter }) => {
               </button>
             )}
           </div>
-          <Form.Text id="filter-help" className="text-muted" style={{ fontSize: '13px', marginTop: '8px' }}>
+          <small id="filter-help" style={{ fontSize: '13px', marginTop: '8px', color: 'var(--text-gray)' }}>
             {newFilter ? `Showing results for "${newFilter}"` : 'Type to search through your contacts'}
-          </Form.Text>
-        </Form.Group>
+          </small>
+        </div>
       </div>
     </div>
   );

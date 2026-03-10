@@ -1,13 +1,16 @@
 const express = require('express');
-const { unknownEndpoint, errorHandler, requestLogger } = require('./middleware/index');
-const morgan = require('morgan');
+const cors = require('cors');
+const { unknownEndpoint, errorHandler, httpLogger } = require('./middleware/index');
 const indexRouter = require('./controllers/indexController');
 const apiRouter = require('./controllers/apiController');
-const { inProduction } = require('./utils/config');
+const { inProduction, ALLOWED_ORIGINS } = require('./utils/config');
 const path = require('path');
-const corsHeaders = require('./middleware/corsHeaders');
 const app = express();
 
+app.use(cors({
+  origin: ALLOWED_ORIGINS,
+  credentials: true,
+}));
 app.use(express.json());
 
 if (inProduction) {
@@ -15,16 +18,7 @@ if (inProduction) {
   app.use(express.static(path.join(__dirname, '../build')));
 }
 
-app.use(corsHeaders);
-app.use(requestLogger);
-
-// eslint-disable-next-line no-unused-vars
-morgan.token('post-data', (request, response) => { // Morgan middleware for logging post requests
-  const { name, number } = request.body;
-  return JSON.stringify({ name, number });
-});
-
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'));
+app.use(httpLogger);
 
 app.use('/api', apiRouter);
 

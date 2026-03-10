@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -7,7 +5,7 @@ const Footer = () => {
     <div className="footer">
       <label>© 2023 - {currentYear} yumeangelica.github.io. All Rights Reserved.</label>
     </div>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

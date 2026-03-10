@@ -1,47 +1,34 @@
-import axios from 'axios';
-
 const baseURL = '/api';
 const personsEndpoint = '/persons';
 
-const axiosClient = axios.create({
-  baseURL: baseURL,
-});
+const request = async (url, options = {}) => {
+  const response = await fetch(`${baseURL}${url}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
 
-const getAllPersons = async () => {
-  try {
-    const response = await axiosClient.get(personsEndpoint);
-    return response;
-  } catch (error) {
+  const isJson = response.headers.get('content-type')?.includes('application/json');
+  const data = isJson ? await response.json() : null;
+
+  if (!response.ok) {
+    const error = new Error(data?.error || response.statusText);
+    error.response = { data, status: response.status };
     throw error;
   }
+
+  return { data, status: response.status };
 };
 
-const createPerson = async (newPerson) => {
-  try {
-    const response = await axiosClient.post(personsEndpoint, newPerson);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+const getAllPersons = () => request(personsEndpoint);
 
-const updatePerson = async (id, updatedDetails) => {
-  try {
-    const response = await axiosClient.put(`${personsEndpoint}/${id}`, updatedDetails);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+const createPerson = (newPerson) =>
+  request(personsEndpoint, { method: 'POST', body: JSON.stringify(newPerson) });
 
-const removePerson = async (id) => {
-  try {
-    const response = await axiosClient.delete(`${personsEndpoint}/${id}`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+const updatePerson = (id, updatedDetails) =>
+  request(`${personsEndpoint}/${id}`, { method: 'PUT', body: JSON.stringify(updatedDetails) });
+
+const removePerson = (id) =>
+  request(`${personsEndpoint}/${id}`, { method: 'DELETE' });
 
 export default {
   getAllPersons,
@@ -49,4 +36,3 @@ export default {
   updatePerson,
   removePerson,
 };
-

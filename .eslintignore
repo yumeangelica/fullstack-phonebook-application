@@ -1,9 +1,0 @@
-node_modules
-dist
-stats.json
-.env
-.DS_Store
-build
-
-/cypress
-/client

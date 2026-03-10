@@ -1,33 +1,39 @@
-
-import React from 'react'
-import '@testing-library/jest-dom'
-import { render } from '@testing-library/react'
-
-import NewPersonsForm from './NewPersonsForm'
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
+import { act } from 'react';
+import { createRoot } from 'react-dom/client';
+import NewPersonsForm from './NewPersonsForm';
 
 describe('<NewPersonsForm />', () => {
-
-  test('renders NewPersonsFom', () => { // Testing to see if NewPersonsForm renders
+  it('renders NewPersonsForm', async () => {
     const mockProps = {
       newFirstName: '',
       newLastName: '',
       newNumber: '',
-      addName: jest.fn(),
-      handleFirstNameChange: jest.fn(),
-      handleLastNameChange: jest.fn(),
-      handleNumberChange: jest.fn()
+      newCountryCode: '+358',
+      addName: () => { },
+      handleFirstNameChange: () => { },
+      handleLastNameChange: () => { },
+      handleNumberChange: () => { },
+      handleCountryCodeChange: () => { }
     };
 
-    const component = render(
-      <NewPersonsForm {...mockProps} />
-    ).container
+    const container = document.createElement('div');
+    document.body.appendChild(container);
 
-    expect(component).toHaveTextContent('Add a new contact') // Testing to see if NewPersonsForm renders
-    expect(component).toHaveTextContent('First Name:')
-    expect(component).toHaveTextContent('Last Name:')
-    expect(component).toHaveTextContent('Number:')
-    expect(component).toHaveTextContent('Add')
-  })
+    await act(async () => {
+      createRoot(container).render(
+        <NewPersonsForm {...mockProps} />
+      );
+    });
 
-})
+    assert.ok(container.textContent.includes('Add a new contact'));
+    assert.ok(container.textContent.includes('First Name:'));
+    assert.ok(container.textContent.includes('Last Name:'));
+    assert.ok(container.textContent.includes('Number:'));
+    assert.ok(container.textContent.includes('Add'));
+
+    document.body.removeChild(container);
+  });
+});
 

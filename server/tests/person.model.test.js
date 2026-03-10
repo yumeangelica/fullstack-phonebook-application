@@ -1,12 +1,18 @@
-const mongoose = require('mongoose');
+const { describe, it, before, after, beforeEach } = require('node:test');
+const assert = require('node:assert');
+const { connectDB, disconnectDB } = require('./setup');
 const Person = require('../models/personModel');
 
 describe('Person model', () => {
+  before(async () => { await connectDB(); });
+  after(async () => { await disconnectDB(); });
+
   beforeEach(async () => {
     await Person.deleteMany({});
   });
+
   describe('Validation', () => {
-    test('creates a valid person', async () => {
+    it('creates a valid person', async () => {
       const personData = {
         firstName: 'John',
         lastName: 'Doe',
@@ -16,13 +22,13 @@ describe('Person model', () => {
       const person = new Person(personData);
       const savedPerson = await person.save();
 
-      expect(savedPerson.firstName).toBe('John');
-      expect(savedPerson.lastName).toBe('Doe');
-      expect(savedPerson.number).toBe('+358 40-1234567');
-      expect(savedPerson.id).toBeDefined();
+      assert.strictEqual(savedPerson.firstName, 'John');
+      assert.strictEqual(savedPerson.lastName, 'Doe');
+      assert.strictEqual(savedPerson.number, '+358 40-1234567');
+      assert.ok(savedPerson.id !== undefined);
     });
 
-    test('trims whitespace from fields', async () => {
+    it('trims whitespace from fields', async () => {
       const personData = {
         firstName: '  Jane  ',
         lastName: '  Smith  ',
@@ -32,45 +38,42 @@ describe('Person model', () => {
       const person = new Person(personData);
       const savedPerson = await person.save();
 
-      expect(savedPerson.firstName).toBe('Jane');
-      expect(savedPerson.lastName).toBe('Smith');
-      expect(savedPerson.number).toBe('+358 44-9876543');
+      assert.strictEqual(savedPerson.firstName, 'Jane');
+      assert.strictEqual(savedPerson.lastName, 'Smith');
+      assert.strictEqual(savedPerson.number, '+358 44-9876543');
     });
 
-    test('requires firstName', async () => {
+    it('requires firstName', async () => {
       const personData = {
         lastName: 'Doe',
         number: '+358 40-1234567'
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/First name is required/);
+      await assert.rejects(() => person.save(), /First name is required/);
     });
 
-    test('requires lastName', async () => {
+    it('requires lastName', async () => {
       const personData = {
         firstName: 'John',
         number: '+358 40-1234567'
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/Last name is required/);
+      await assert.rejects(() => person.save(), /Last name is required/);
     });
 
-    test('requires number', async () => {
+    it('requires number', async () => {
       const personData = {
         firstName: 'John',
         lastName: 'Doe'
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/Phone number is required/);
+      await assert.rejects(() => person.save(), /Phone number is required/);
     });
 
-    test('validates minimum firstName length', async () => {
+    it('validates minimum firstName length', async () => {
       const personData = {
         firstName: 'Jo',
         lastName: 'Doe',
@@ -78,11 +81,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/First name must be at least 3 characters/);
+      await assert.rejects(() => person.save(), /First name must be at least 3 characters/);
     });
 
-    test('validates minimum lastName length', async () => {
+    it('validates minimum lastName length', async () => {
       const personData = {
         firstName: 'John',
         lastName: 'Do',
@@ -90,11 +92,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/Last name must be at least 3 characters/);
+      await assert.rejects(() => person.save(), /Last name must be at least 3 characters/);
     });
 
-    test('validates minimum number length', async () => {
+    it('validates minimum number length', async () => {
       const personData = {
         firstName: 'John',
         lastName: 'Doe',
@@ -102,11 +103,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/is not a valid phone number/);
+      await assert.rejects(() => person.save(), /is not a valid phone number/);
     });
 
-    test('validates maximum firstName length', async () => {
+    it('validates maximum firstName length', async () => {
       const personData = {
         firstName: 'J'.repeat(51),
         lastName: 'Doe',
@@ -114,11 +114,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/First name cannot exceed 50 characters/);
+      await assert.rejects(() => person.save(), /First name cannot exceed 50 characters/);
     });
 
-    test('validates phone number format', async () => {
+    it('validates phone number format', async () => {
       const personData = {
         firstName: 'John',
         lastName: 'Doe',
@@ -126,11 +125,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-
-      await expect(person.save()).rejects.toThrow(/is not a valid phone number/);
+      await assert.rejects(() => person.save(), /is not a valid phone number/);
     });
 
-    test('accepts various valid phone number formats', async () => {
+    it('accepts various valid phone number formats', async () => {
       const validNumbers = [
         '+358 40 1234567',
         '+358 50 1234567',
@@ -147,19 +145,20 @@ describe('Person model', () => {
         const number = validNumbers[i];
         const personData = {
           firstName: 'John',
-          lastName: lastNames[i], // Use valid name without numbers
+          lastName: lastNames[i],
           number
         };
 
         const person = new Person(personData);
-        await expect(person.save()).resolves.toBeDefined();
-        await person.deleteOne(); // Clean up
+        const result = await person.save();
+        assert.ok(result !== undefined);
+        await person.deleteOne();
       }
     });
   });
 
   describe('Virtual fields', () => {
-    test('provides fullName virtual', async () => {
+    it('provides fullName virtual', async () => {
       const personData = {
         firstName: 'Alice',
         lastName: 'Smith',
@@ -169,12 +168,12 @@ describe('Person model', () => {
       const person = new Person(personData);
       await person.save();
 
-      expect(person.fullName).toBe('Alice Smith');
+      assert.strictEqual(person.fullName, 'Alice Smith');
     });
   });
 
   describe('JSON transformation', () => {
-    test('transforms _id to id in JSON', async () => {
+    it('transforms _id to id in JSON', async () => {
       const personData = {
         firstName: 'Bob',
         lastName: 'Wilson',
@@ -185,14 +184,14 @@ describe('Person model', () => {
       const savedPerson = await person.save();
       const jsonPerson = savedPerson.toJSON();
 
-      expect(jsonPerson.id).toBeDefined();
-      expect(jsonPerson._id).toBeUndefined();
-      expect(jsonPerson.__v).toBeUndefined();
+      assert.ok(jsonPerson.id !== undefined);
+      assert.strictEqual(jsonPerson._id, undefined);
+      assert.strictEqual(jsonPerson.__v, undefined);
     });
   });
 
   describe('Indexes', () => {
-    test('enforces unique firstName and lastName combination', async () => {
+    it('enforces unique firstName and lastName combination', async () => {
       const personData = {
         firstName: 'Charlie',
         lastName: 'Brown',
@@ -205,15 +204,14 @@ describe('Person model', () => {
       const duplicatePersonData = {
         firstName: 'Charlie',
         lastName: 'Brown',
-        number: '+358 50-9876543' // Different number
+        number: '+358 50-9876543'
       };
 
       const person2 = new Person(duplicatePersonData);
-
-      await expect(person2.save()).rejects.toThrow();
+      await assert.rejects(() => person2.save());
     });
 
-    test('enforces unique phone number', async () => {
+    it('enforces unique phone number', async () => {
       const personData1 = {
         firstName: 'David',
         lastName: 'Miller',
@@ -224,19 +222,18 @@ describe('Person model', () => {
       await person1.save();
 
       const personData2 = {
-        firstName: 'Jane', // Different name
+        firstName: 'Jane',
         lastName: 'Smith',
-        number: '+358 45-1234567' // Same number
+        number: '+358 45-1234567'
       };
 
       const person2 = new Person(personData2);
-
-      await expect(person2.save()).rejects.toThrow();
+      await assert.rejects(() => person2.save());
     });
   });
 
   describe('Timestamps', () => {
-    test('adds createdAt and updatedAt timestamps', async () => {
+    it('adds createdAt and updatedAt timestamps', async () => {
       const personData = {
         firstName: 'Emma',
         lastName: 'Johnson',
@@ -246,13 +243,13 @@ describe('Person model', () => {
       const person = new Person(personData);
       const savedPerson = await person.save();
 
-      expect(savedPerson.createdAt).toBeDefined();
-      expect(savedPerson.updatedAt).toBeDefined();
-      expect(savedPerson.createdAt).toBeInstanceOf(Date);
-      expect(savedPerson.updatedAt).toBeInstanceOf(Date);
+      assert.ok(savedPerson.createdAt !== undefined);
+      assert.ok(savedPerson.updatedAt !== undefined);
+      assert.ok(savedPerson.createdAt instanceof Date);
+      assert.ok(savedPerson.updatedAt instanceof Date);
     });
 
-    test('updates updatedAt timestamp on modification', async () => {
+    it('updates updatedAt timestamp on modification', async () => {
       const personData = {
         firstName: 'Frank',
         lastName: 'Garcia',
@@ -263,17 +260,12 @@ describe('Person model', () => {
       const savedPerson = await person.save();
       const originalUpdatedAt = savedPerson.updatedAt;
 
-      // Wait a moment to ensure different timestamp
       await new Promise(resolve => setTimeout(resolve, 10));
 
       savedPerson.firstName = 'Francisco';
       const updatedPerson = await savedPerson.save();
 
-      expect(updatedPerson.updatedAt.getTime()).toBeGreaterThan(originalUpdatedAt.getTime());
+      assert.ok(updatedPerson.updatedAt.getTime() > originalUpdatedAt.getTime());
     });
   });
-});
-
-afterAll(async () => {
-  await mongoose.connection.close();
 });

@@ -1,4 +1,3 @@
-// eslint-disable-next-line new-cap
 const apiRouter = require('express').Router();
 const Person = require('../models/personModel');
 const { parsePhoneNumber, isValidPhoneNumber } = require('libphonenumber-js');
@@ -18,7 +17,7 @@ const normalizePhoneNumber = (number) => {
     }
 
     return number; // Return as-is if parsing fails
-  } catch (error) {
+  } catch (_error) {
     return number; // Return as-is if any error occurs
   }
 };
@@ -112,7 +111,7 @@ apiRouter.post('/persons', async (request, response, next) => {
 
 // Update a person's number
 apiRouter.put('/persons/:id', async (request, response, next) => {
-  const { firstName, lastName, number } = request.body;
+  let { firstName, lastName, number } = request.body;
 
   // Initialize the update object
   const updateData = {};
