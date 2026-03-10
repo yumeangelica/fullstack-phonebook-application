@@ -1,6 +1,6 @@
 {
   "name": "fullstack-phonebook-application",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A modern phonebook application with real-time validation, international phone number support, and comprehensive testing. Originally created for Full Stack Open 2023, modernized in 2026.",
   "main": "index.js",
   "scripts": {
@@ -12,8 +12,8 @@
     "build": "webpack --mode production",
     "test": "npm run test:frontend && npm run test:backend",
     "test:frontend": "node --require @babel/register --require ./client/test-setup.js --test client/components/*.test.js",
-    "test:backend": "NODE_ENV=test node --env-file=.env --test --test-concurrency=1 server/tests/*.test.js",
-    "test:watch": "NODE_ENV=test node --env-file=.env --test --watch --test-concurrency=1 server/tests/*.test.js",
+    "test:backend": "NODE_ENV=test node --env-file-if-exists=.env --test --test-concurrency=1 server/tests/*.test.js",
+    "test:watch": "NODE_ENV=test node --env-file-if-exists=.env --test --watch --test-concurrency=1 server/tests/*.test.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

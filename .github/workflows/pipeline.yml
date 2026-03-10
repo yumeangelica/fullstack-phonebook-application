@@ -27,8 +27,8 @@ jobs:
 
     env:
       NODE_ENV: test
-      TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI || 'mongodb://testuser:testpass@localhost:27017/test_phonebook?authSource=admin' }}
-      MONGODB_URI: ${{ secrets.TEST_MONGODB_URI || 'mongodb://testuser:testpass@localhost:27017/test_phonebook?authSource=admin' }}
+      TEST_MONGODB_URI: "${{ secrets.TEST_MONGODB_URI || 'mongodb://testuser:testpass@localhost:27017/test_phonebook?authSource=admin' }}"
+      MONGODB_URI: "${{ secrets.TEST_MONGODB_URI || 'mongodb://testuser:testpass@localhost:27017/test_phonebook?authSource=admin' }}"
 
     steps:
       - name: Checkout code
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
