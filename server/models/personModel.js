@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 const { isValidPhoneNumber } = require('libphonenumber-js');
 
+// Shared transform for JSON and Object serialization
+const idTransform = (doc, ret) => {
+  ret.id = ret._id.toString();
+  delete ret._id;
+  delete ret.__v;
+  return ret;
+};
+
 const personSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -76,24 +84,9 @@ const personSchema = new mongoose.Schema({
     trim: true,
   },
 }, {
-  timestamps: true, // Automatically adds createdAt and updatedAt fields for audit trails
-  toJSON: {
-    transform(doc, ret) {
-      // Transform MongoDB _id to more conventional 'id' for frontend consumption
-      ret.id = ret._id.toString();
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
-  },
-  toObject: {
-    transform(doc, ret) {
-      ret.id = ret._id.toString();
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
-  },
+  timestamps: true,
+  toJSON: { transform: idTransform },
+  toObject: { transform: idTransform },
 });
 
 // Database indexing for performance optimization and data integrity

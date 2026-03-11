@@ -1,5 +1,10 @@
+/* ==========================================================================
+   Fullstack Phonebook — Global Styles
+   Cleaned up: removed duplicates, !important overrides, inline styles
+   ========================================================================== */
+
 :root {
-  /* Color Variables */
+  /* Colors */
   --primary-pink: #c57898;
   --light-pink: #eaaab9;
   --lighter-pink: #f0bdc9;
@@ -18,6 +23,25 @@
   --error-text: #dc2626;
   --error-border: #fecaca;
   --hover-bg: #faf5ff;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 40px;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -25,18 +49,13 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100vh;
   margin: 0;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-* {
-  box-sizing: border-box;
+  padding: var(--spacing-lg);
 }
 
 h1, h2, h3, h4 {
   color: var(--primary-pink);
   font-weight: 600;
-  margin: 0 0 16px 0;
+  margin: 0 0 var(--spacing-lg) 0;
 }
 
 h1 {
@@ -44,10 +63,27 @@ h1 {
   text-align: center;
 }
 
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   Layout — Container
+   ========================================================================== */
+
 .container {
   max-width: 500px;
   margin: 0 auto;
-  padding: 20px;
+  padding: var(--spacing-xl);
   background: var(--bg-white);
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(168, 85, 247, 0.1);
@@ -55,30 +91,14 @@ h1 {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Tablet and larger screens */
-@media (min-width: 769px) {
-  .container {
-    max-width: 700px;
-  }
-}
+/* ==========================================================================
+   Notifications
+   ========================================================================== */
 
-/* Desktop screens */
-@media (min-width: 1024px) {
-  .container {
-    max-width: 900px;
-  }
-}
-
-/* Large desktop screens */
-@media (min-width: 1200px) {
-  .container {
-    max-width: 1200px;
-  }
-}
-
-.notification_green, .error_red {
-  padding: 12px 16px;
-  margin-bottom: 16px;
+.notification_green,
+.error_red {
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
   border-radius: 12px;
   font-weight: 500;
   font-size: 14px;
@@ -96,12 +116,35 @@ h1 {
   border: 1px solid var(--error-border);
 }
 
-.actionbtn, .submit-btn {
+.notification-alert {
+  animation: slideInFromTop 0.3s ease-out;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.actionbtn,
+.submit-btn {
   background: linear-gradient(135deg, var(--light-pink) 0%, var(--lighter-pink) 100%);
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: var(--spacing-sm) var(--spacing-lg);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -110,7 +153,8 @@ h1 {
   overflow: hidden;
 }
 
-.actionbtn::before, .submit-btn::before {
+.actionbtn::before,
+.submit-btn::before {
   content: '';
   position: absolute;
   top: 0;
@@ -121,355 +165,73 @@ h1 {
   transition: left 0.5s;
 }
 
-.actionbtn:hover::before, .submit-btn:hover::before {
+.actionbtn:hover::before,
+.submit-btn:hover::before {
   left: 100%;
 }
 
-.actionbtn:hover, .submit-btn:hover {
+.actionbtn:hover,
+.submit-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(217, 117, 134, 0.3);
 }
 
-.input-width, .filter-input, .form-input {
+.submit-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggle-form-container {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ==========================================================================
+   Inputs & Selects
+   ========================================================================== */
+
+.input-width,
+.filter-input,
+.form-input {
   width: 100%;
   max-width: 100%;
   height: 40px;
   border: 2px solid var(--border-gray);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
   font-size: 14px;
   background: white;
   transition: border-color 0.2s ease;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-md);
   transform: scale(1);
 }
 
-/* Extra padding for filter input when clear button is present */
-.filter-input-wrapper .filter-input {
-  padding-right: 35px;
-  /* Space for X button */
-  margin-bottom: 0;
-  /* Remove default margin */
-}
-
-.filter-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-width:focus, .filter-input:focus, .form-input:focus {
+.input-width:focus,
+.filter-input:focus,
+.form-input:focus {
   outline: none;
   border-color: var(--primary-pink);
   box-shadow: 0 0 0 3px rgba(217, 117, 134, 0.1);
   transform: scale(1.02);
 }
 
-.table-container {
-  background: var(--bg-white-solid);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 20px 0;
-  overflow-x: auto;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.table-title {
-  text-align: center;
-  color: var(--primary-pink);
-  margin-bottom: 16px;
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.custom-table thead {
-  background: linear-gradient(135deg, var(--light-pink) 0%, var(--lighter-pink) 100%);
-}
-
-.custom-table thead th {
-  color: white;
-  font-weight: 600;
-  padding: 12px 8px;
-  text-align: center;
-  font-size: 14px;
-}
-
-/* Better table spacing on larger screens */
-@media (min-width: 769px) {
-  .custom-table thead th {
-    padding: 16px 12px;
-    font-size: 16px;
-  }
-
-  .custom-table td {
-    padding: 16px 12px;
-    font-size: 15px;
-  }
-}
-
-.custom-table tbody tr {
-  border-bottom: 1px solid var(--border-light);
-}
-
-.custom-table tbody tr:hover {
-  background: var(--hover-bg);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.custom-table td {
-  padding: 12px 8px;
-  text-align: center;
-  font-size: 14px;
-  word-break: break-word;
-}
-
-.form-container {
-  margin: 20px 0;
-}
-
-.form-content {
-  background: var(--bg-white-solid);
-  border-radius: 12px;
-  padding: 20px;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Better form layout on larger screens */
-@media (min-width: 769px) {
-  .form-content {
-    padding: 30px;
-  }
-
-  .new-person-form {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-}
-
-/* Tabletti ja läppäri näytöt - maltillinen levennys */
-@media (min-width: 768px) {
-  .container {
-    max-width: 700px;
-  }
-
-  .filter-container {
-    max-width: 500px;
-    margin: 20px auto;
-  }
-
-  .form-container {
-    max-width: 500px;
-    margin: 20px auto;
-  }
-}
-
-/* Bigger screens - further expansion */
-@media (min-width: 1024px) {
-  .container {
-    max-width: 900px;
-  }
-
-  .filter-container {
-    max-width: 600px;
-    margin: 20px auto;
-  }
-
-  .form-container {
-    max-width: 600px;
-    margin: 20px auto;
-  }
-
-  .custom-table {
-    font-size: 1rem;
-  }
-
-  .custom-table th,
-  .custom-table td {
-    padding: 16px;
-  }
-}
-
-.form-title {
-  text-align: center;
-  color: var(--primary-pink);
-  margin-bottom: 20px;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.new-person-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.form-label {
-  color: var(--text-gray);
-  font-weight: 500;
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.filter-container {
-  margin: 24px auto;
-  max-width: 400px;
-  padding: 0 16px;
-}
-
-.filter-content {
-  width: 100%;
-  background: var(--bg-white-solid);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(15px);
-}
-
-/* Wider filter on larger screens */
-@media (min-width: 769px) {
-  .filter-container {
-    max-width: 500px;
-  }
-
-  .filter-content {
-    padding: 24px;
-  }
-}
-
-.filter-label {
-  display: block;
-  text-align: left;
-  color: var(--primary-pink);
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  letter-spacing: 0.3px;
-}
-
-.footer {
-  text-align: center;
-  color: var(--text-light-gray);
-  margin-top: 40px;
-  font-size: 14px;
-}
-
-/* Modern animations and transitions */
-.notification-alert {
-  animation: slideInFromTop 0.3s ease-out;
-  border: none !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  font-weight: 500 !important;
-}
-
-@keyframes slideInFromTop {
-  0% {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Loading spinner placeholder */
-.loading-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Validation styles */
-.validation-icon {
-  font-weight: bold;
-  margin-left: 8px;
-}
-
-.validation-icon.valid {
-  color: #10b981;
-}
-
-.validation-icon.invalid {
-  color: #ef4444;
-}
-
-.validation-message {
-  font-size: 0.875rem;
-  margin-top: 4px;
-  margin-bottom: 16px;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.validation-message.error {
-  color: var(--error-text);
-  background-color: var(--error-bg);
-  border: 1px solid var(--error-border);
-}
-
-.validation-message.success {
-  color: var(--success-text);
-  background-color: var(--success-bg);
-  border: 1px solid var(--success-border);
-}
-
-/* Form input validation states */
-.form-input.is-valid {
-  border-color: #10b981 !important;
-  box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25) !important;
-}
-
-.form-input.is-invalid {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
-}
-
-/* Submit button disabled state */
-.submit-btn.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Form label improvements */
-.form-label {
-  font-weight: 600;
-  color: var(--text-gray);
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-/* Placeholder text styling */
 .form-input::placeholder {
   color: var(--text-light-gray);
   font-style: italic;
 }
 
-/* Focus states for better accessibility */
+/* Validation states */
+.form-input.is-valid {
+  border-color: #10b981;
+  box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
+}
+
+.form-input.is-invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+}
+
 .form-input:focus.is-valid {
   border-color: #10b981;
   box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
@@ -480,70 +242,36 @@ h1 {
   box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
 }
 
-@media (max-width: 768px) {
-  body {
-    padding: 8px;
-  }
+/* ==========================================================================
+   Filter
+   ========================================================================== */
 
-  .container {
-    padding: 16px;
-    margin: 0 auto;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  .table-container {
-    padding: 12px;
-    overflow-x: auto;
-  }
-
-  .custom-table thead {
-    display: none;
-  }
-
-  .custom-table td {
-    display: block;
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-bottom: 1px solid var(--border-light);
-    text-align: left;
-  }
-
-  .custom-table td:before {
-    content: attr(data-label) ": ";
-    font-weight: 600;
-    color: var(--primary-pink);
-  }
-
-  .custom-table tbody tr {
-    display: block;
-    margin-bottom: 16px;
-    border: 1px solid var(--border-light);
-    border-radius: 8px;
-    padding: 8px;
-    background: white;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .custom-table tbody tr:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .form-content {
-    padding: 16px;
-  }
-
-  .actionbtn {
-    width: 100%;
-    margin: 8px 0;
-  }
+.filter-container {
+  margin: var(--spacing-2xl) auto;
+  max-width: 400px;
+  padding: 0 var(--spacing-lg);
 }
 
-/* Filter input wrapper for clear button */
+.filter-content {
+  width: 100%;
+  background: var(--bg-white-solid);
+  border-radius: 12px;
+  padding: var(--spacing-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
+}
+
+.filter-label {
+  display: block;
+  text-align: left;
+  color: var(--primary-pink);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: 0.3px;
+}
+
 .filter-input-wrapper {
   position: relative;
   display: flex;
@@ -551,13 +279,12 @@ h1 {
   width: 100%;
 }
 
-/* Filter input specific styling */
 .filter-input-wrapper .filter-input {
   width: 100%;
   height: 44px;
   border: 2px solid var(--border-gray);
   border-radius: 10px;
-  padding: 12px 40px 12px 16px;
+  padding: var(--spacing-md) 40px var(--spacing-md) var(--spacing-lg);
   font-size: 15px;
   background: white;
   transition: all 0.2s ease;
@@ -598,20 +325,153 @@ h1 {
   background: rgba(217, 117, 134, 0.1);
 }
 
-/* Form buttons container */
-.form-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
+.filter-help-text {
+  font-size: 13px;
+  margin-top: var(--spacing-sm);
+  color: var(--text-gray);
+  display: block;
 }
 
-/* Clear button styling */
+/* ==========================================================================
+   Table
+   ========================================================================== */
+
+.table-container {
+  background: var(--bg-white-solid);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  margin: var(--spacing-xl) 0;
+  overflow-x: auto;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.table-title {
+  text-align: center;
+  color: var(--primary-pink);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.table-status-message {
+  text-align: center;
+  color: var(--text-gray);
+  font-size: 14px;
+  padding: var(--spacing-xl) 0;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-table thead {
+  background: linear-gradient(135deg, var(--light-pink) 0%, var(--lighter-pink) 100%);
+}
+
+.custom-table thead th {
+  color: white;
+  font-weight: 600;
+  padding: var(--spacing-md) var(--spacing-sm);
+  text-align: center;
+  font-size: 14px;
+}
+
+.custom-table tbody tr {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.custom-table tbody tr:hover {
+  background: var(--hover-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-table td {
+  padding: var(--spacing-md) var(--spacing-sm);
+  text-align: center;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+/* ==========================================================================
+   Form
+   ========================================================================== */
+
+.form-container {
+  margin: var(--spacing-xl) 0;
+}
+
+.form-content {
+  background: var(--bg-white-solid);
+  border-radius: 12px;
+  padding: var(--spacing-xl);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.form-title {
+  text-align: center;
+  color: var(--primary-pink);
+  margin-bottom: var(--spacing-xl);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.new-person-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-gray);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+/* Phone input row (replaces inline flex styles) */
+.phone-input-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+}
+
+.country-select {
+  flex: 0 0 140px;
+}
+
+.phone-number-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.phone-number-wrapper .form-input {
+  margin-bottom: 0;
+}
+
+/* Clear button */
 .clear-btn {
   background: transparent;
   color: var(--text-gray);
   border: 2px solid var(--border-gray);
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: var(--spacing-sm) var(--spacing-lg);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -630,7 +490,231 @@ h1 {
   outline-offset: 2px;
 }
 
-/* Responsive button layout */
+/* ==========================================================================
+   Validation
+   ========================================================================== */
+
+.validation-icon {
+  font-weight: bold;
+  margin-left: var(--spacing-sm);
+}
+
+.validation-icon.valid {
+  color: #10b981;
+}
+
+.validation-icon.invalid {
+  color: #ef4444;
+}
+
+.validation-message {
+  font-size: 0.875rem;
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+}
+
+.validation-message.error {
+  color: var(--error-text);
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
+}
+
+.validation-message.success {
+  color: var(--success-text);
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-border);
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.footer {
+  text-align: center;
+  color: var(--text-light-gray);
+  margin-top: var(--spacing-3xl);
+  font-size: 14px;
+}
+
+.footer p {
+  margin: 0;
+}
+
+/* ==========================================================================
+   Loading spinner (utility)
+   ========================================================================== */
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Responsive — Tablet and larger (768px+)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 700px;
+  }
+
+  .filter-container {
+    max-width: 500px;
+    margin: var(--spacing-xl) auto;
+  }
+
+  .filter-content {
+    padding: var(--spacing-2xl);
+  }
+
+  .form-container {
+    max-width: 500px;
+    margin: var(--spacing-xl) auto;
+  }
+
+  .form-content {
+    padding: 30px;
+  }
+
+  .new-person-form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .custom-table thead th {
+    padding: var(--spacing-lg) var(--spacing-md);
+    font-size: 16px;
+  }
+
+  .custom-table td {
+    padding: var(--spacing-lg) var(--spacing-md);
+    font-size: 15px;
+  }
+}
+
+/* ==========================================================================
+   Responsive — Desktop (1024px+)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 900px;
+  }
+
+  .filter-container {
+    max-width: 600px;
+    margin: var(--spacing-xl) auto;
+  }
+
+  .form-container {
+    max-width: 600px;
+    margin: var(--spacing-xl) auto;
+  }
+
+  .custom-table {
+    font-size: 1rem;
+  }
+
+  .custom-table th,
+  .custom-table td {
+    padding: var(--spacing-lg);
+  }
+}
+
+/* ==========================================================================
+   Responsive — Large desktop (1200px+)
+   ========================================================================== */
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1200px;
+  }
+}
+
+/* ==========================================================================
+   Responsive — Mobile (max 768px)
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  body {
+    padding: var(--spacing-sm);
+  }
+
+  .container {
+    padding: var(--spacing-lg);
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .table-container {
+    padding: var(--spacing-md);
+    overflow-x: auto;
+  }
+
+  .custom-table thead {
+    display: none;
+  }
+
+  .custom-table td {
+    display: block;
+    width: 100%;
+    padding: var(--spacing-sm);
+    border: none;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+  }
+
+  .custom-table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: var(--primary-pink);
+  }
+
+  .custom-table tbody tr {
+    display: block;
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: var(--spacing-sm);
+    background: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .custom-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-content {
+    padding: var(--spacing-lg);
+  }
+
+  .actionbtn {
+    width: 100%;
+    margin: var(--spacing-sm) 0;
+  }
+}
+
+/* ==========================================================================
+   Responsive — Small mobile (max 480px)
+   ========================================================================== */
+
 @media (max-width: 480px) {
   .form-buttons {
     flex-direction: column;

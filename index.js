@@ -1,24 +1,23 @@
 const app = require('./server/app');
 const { MONGODB_URI, PORT } = require('./server/utils/config');
-const { connectToMongoDB } = require('./server/utils/database');
+const { connectToMongoDB, disconnectFromMongoDB } = require('./server/utils/database');
 
 const startServer = async () => {
   try {
-    // Connect to MongoDB with retry logic
     await connectToMongoDB(MONGODB_URI);
 
-    // Start the server
     const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📍 Health check available at http://localhost:${PORT}/health`);
       console.log(`🌐 API available at http://localhost:${PORT}/api`);
     });
 
-    // Graceful shutdown
-    const gracefulShutdown = (signal) => {
+    // Graceful shutdown — close HTTP server, then DB connection
+    const gracefulShutdown = async (signal) => {
       console.log(`\n📥 Received ${signal}. Gracefully shutting down...`);
-      server.close(() => {
+      server.close(async () => {
         console.log('✅ HTTP server closed');
+        await disconnectFromMongoDB();
         process.exit(0);
       });
     };

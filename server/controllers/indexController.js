@@ -5,14 +5,13 @@ indexRouter.get('/', (request, response) => {
   response.send('<h1>Welcome to phonebook app back-end!</h1>');
 });
 
-indexRouter.get('/info', async (request, response) => {
+indexRouter.get('/info', async (request, response, next) => {
   try {
-    const persons = await Person.find({});
+    const count = await Person.countDocuments({});
     const today = new Date();
-    response.send(`<p> Phonebook has info for ${persons.length} people <br> ${today} </p>`);
+    response.send(`<p> Phonebook has info for ${count} people <br> ${today} </p>`);
   } catch (error) {
-    console.log('error', error);
-    response.status(500).json({ error: 'Server error' });
+    next(error);
   }
 });
 

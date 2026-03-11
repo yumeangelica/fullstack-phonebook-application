@@ -1,19 +1,25 @@
 const mongoose = require('mongoose');
 
+// Track whether event listeners have been registered
+let listenersRegistered = false;
+
 // Enhanced MongoDB connection with retry logic and production-ready configuration
 const connectToMongoDB = async (uri, options = {}) => {
+  if (!uri) {
+    throw new Error('MongoDB URI is required. Set MONGODB_URI environment variable.');
+  }
+
   const defaultOptions = {
-    maxPoolSize: 10, // Maximum number of connections in the pool
-    serverSelectionTimeoutMS: 5000, // How long to try connecting to server
-    socketTimeoutMS: 45000, // How long to wait for socket to close
-    family: 4, // Use IPv4, skip trying IPv6 for better compatibility
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    family: 4,
     ...options
   };
 
   const maxRetries = 5;
   let retries = 0;
 
-  // Retry connection logic for handling transient network issues
   while (retries < maxRetries) {
     try {
       console.log(`Attempting to connect to MongoDB... (attempt ${retries + 1}/${maxRetries})`);
@@ -22,26 +28,22 @@ const connectToMongoDB = async (uri, options = {}) => {
 
       console.log('✅ Successfully connected to MongoDB');
 
-      // Set up connection event listeners for monitoring
-      mongoose.connection.on('error', (error) => {
-        console.error('❌ MongoDB connection error:', error);
-      });
+      // Register event listeners only once to prevent stacking on retries
+      if (!listenersRegistered) {
+        mongoose.connection.on('error', (error) => {
+          console.error('❌ MongoDB connection error:', error);
+        });
 
-      mongoose.connection.on('disconnected', () => {
-        console.warn('⚠️ MongoDB disconnected');
-      });
+        mongoose.connection.on('disconnected', () => {
+          console.warn('⚠️ MongoDB disconnected');
+        });
 
-      mongoose.connection.on('reconnected', () => {
-        console.log('🔄 MongoDB reconnected');
-      });
+        mongoose.connection.on('reconnected', () => {
+          console.log('🔄 MongoDB reconnected');
+        });
 
-      // Handle application termination
-      process.on('SIGINT', async () => {
-        console.log('\n⏹️ Received SIGINT. Gracefully shutting down...');
-        await mongoose.connection.close();
-        console.log('✅ MongoDB connection closed');
-        process.exit(0);
-      });
+        listenersRegistered = true;
+      }
 
       return mongoose.connection;
     } catch (error) {
@@ -49,7 +51,6 @@ const connectToMongoDB = async (uri, options = {}) => {
       console.error(`❌ MongoDB connection failed (attempt ${retries}/${maxRetries}):`, error.message);
 
       if (retries === maxRetries) {
-        console.error('💀 Max retries reached. Could not connect to MongoDB');
         throw new Error(`Failed to connect to MongoDB after ${maxRetries} attempts: ${error.message}`);
       }
 
@@ -61,30 +62,8 @@ const connectToMongoDB = async (uri, options = {}) => {
   }
 };
 
-// Connection health check
-const checkConnection = () => {
-  return mongoose.connection.readyState === 1;
-};
-
-// Get connection status
-const getConnectionStatus = () => {
-  const states = {
-    0: 'disconnected',
-    1: 'connected',
-    2: 'connecting',
-    3: 'disconnecting'
-  };
-
-  return {
-    state: states[mongoose.connection.readyState],
-    host: mongoose.connection.host,
-    name: mongoose.connection.name,
-    readyState: mongoose.connection.readyState
-  };
-};
-
-// Graceful shutdown
-const gracefulShutdown = async () => {
+// Graceful shutdown — close MongoDB connection
+const disconnectFromMongoDB = async () => {
   try {
     await mongoose.connection.close();
     console.log('✅ MongoDB connection closed gracefully');
@@ -95,7 +74,5 @@ const gracefulShutdown = async () => {
 
 module.exports = {
   connectToMongoDB,
-  checkConnection,
-  getConnectionStatus,
-  gracefulShutdown
+  disconnectFromMongoDB
 };

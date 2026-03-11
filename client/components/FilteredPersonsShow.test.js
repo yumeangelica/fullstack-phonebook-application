@@ -23,10 +23,12 @@ describe('<FilteredPersonsShow />', () => {
 
     const container = document.createElement('div');
     document.body.appendChild(container);
+    let root;
 
     await act(async () => {
-      createRoot(container).render(
-        <FilteredPersonsShow filteredPersons={persons} removePerson={() => { }} />
+      root = createRoot(container);
+      root.render(
+        <FilteredPersonsShow filteredPersons={persons} removePerson={() => { }} loading={false} />
       );
     });
 
@@ -38,6 +40,48 @@ describe('<FilteredPersonsShow />', () => {
     assert.ok(container.textContent.includes(persons[1].number));
     assert.ok(container.textContent.includes('delete'));
 
+    // Check accessible delete button labels
+    const deleteButtons = container.querySelectorAll('button[aria-label]');
+    assert.strictEqual(deleteButtons.length, 2);
+    assert.ok(deleteButtons[0].getAttribute('aria-label').includes('miuku'));
+
+    await act(() => root.unmount());
+    document.body.removeChild(container);
+  });
+
+  it('renders empty state when no persons', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    let root;
+
+    await act(async () => {
+      root = createRoot(container);
+      root.render(
+        <FilteredPersonsShow filteredPersons={[]} removePerson={() => { }} loading={false} />
+      );
+    });
+
+    assert.ok(container.textContent.includes('No contacts found'));
+
+    await act(() => root.unmount());
+    document.body.removeChild(container);
+  });
+
+  it('renders loading state', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    let root;
+
+    await act(async () => {
+      root = createRoot(container);
+      root.render(
+        <FilteredPersonsShow filteredPersons={[]} removePerson={() => { }} loading={true} />
+      );
+    });
+
+    assert.ok(container.textContent.includes('Loading contacts'));
+
+    await act(() => root.unmount());
     document.body.removeChild(container);
   });
 });

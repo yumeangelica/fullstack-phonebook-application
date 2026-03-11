@@ -1,7 +1,6 @@
 // Express requires 4 params to identify error-handling middleware
 const errorHandler = (error, request, response, _next) => {
   console.error(`Error: ${error.message}`);
-  console.error(`Stack: ${error.stack}`);
 
   // MongoDB validation errors - extract and format user-friendly messages
   if (error.name === 'ValidationError') {
@@ -35,16 +34,7 @@ const errorHandler = (error, request, response, _next) => {
     });
   }
 
-  // JWT errors (if using JWT for authentication)
-  if (error.name === 'JsonWebTokenError') {
-    return response.status(401).json({ error: 'Invalid token' });
-  }
-
-  if (error.name === 'TokenExpiredError') {
-    return response.status(401).json({ error: 'Token expired' });
-  }
-
-  // Rate limiting errors (if using a rate limiter)
+  // Rate limiting errors
   if (error.status === 429) {
     return response.status(429).json({
       error: 'Too many requests, please try again later'
@@ -58,7 +48,7 @@ const errorHandler = (error, request, response, _next) => {
   });
 };
 
-// HTTP request logging middleware — replaces morgan + requestLogger
+// HTTP request logging middleware
 const httpLogger = (request, response, next) => {
   const start = Date.now();
 
@@ -70,11 +60,9 @@ const httpLogger = (request, response, next) => {
 
     let line = `${method} ${url} ${statusCode} ${contentLength} - ${duration}ms`;
 
-    if (method === 'POST' || method === 'PUT') {
-      const body = request.body
-        ? JSON.stringify({ name: request.body.name, number: request.body.number })
-        : '';
-      line += ` ${body}`;
+    if ((method === 'POST' || method === 'PUT') && request.body) {
+      const { firstName, lastName, number } = request.body;
+      line += ` ${JSON.stringify({ firstName, lastName, number })}`;
     }
 
     console.log(line);
@@ -87,21 +75,29 @@ const httpLogger = (request, response, next) => {
 const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
   const requests = new Map();
 
+  // Periodic cleanup to prevent memory leaks
+  const cleanupInterval = setInterval(() => {
+    const now = Date.now();
+    const windowStart = now - windowMs;
+    for (const [key, timestamps] of requests.entries()) {
+      const filtered = timestamps.filter(time => time > windowStart);
+      if (filtered.length === 0) {
+        requests.delete(key);
+      } else {
+        requests.set(key, filtered);
+      }
+    }
+  }, windowMs);
+
+  // Don't prevent Node.js from exiting
+  cleanupInterval.unref();
+
   return (req, res, next) => {
-    const ip = req.ip || req.connection.remoteAddress;
+    const ip = req.ip || req.connection?.remoteAddress;
     const now = Date.now();
     const windowStart = now - windowMs;
 
-    // Clean expired entries to prevent memory leaks
-    for (const [key, timestamps] of requests.entries()) {
-      requests.set(key, timestamps.filter(time => time > windowStart));
-      if (requests.get(key).length === 0) {
-        requests.delete(key);
-      }
-    }
-
-    // Check if IP has exceeded rate limit
-    const ipRequests = requests.get(ip) || [];
+    const ipRequests = (requests.get(ip) || []).filter(time => time > windowStart);
 
     if (ipRequests.length >= max) {
       return res.status(429).json({
@@ -110,7 +106,6 @@ const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
       });
     }
 
-    // Track this request
     ipRequests.push(now);
     requests.set(ip, ipRequests);
     next();
@@ -126,7 +121,7 @@ const unknownEndpoint = (request, response) => {
 };
 
 // Security headers middleware
-const securityHeaders = (req, res, next) => {
+const securityHeaders = (_req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');

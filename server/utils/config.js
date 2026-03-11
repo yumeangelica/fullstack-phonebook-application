@@ -4,7 +4,7 @@ const MONGODB_URI = process.env.NODE_ENV === 'test'
   : process.env.MONGODB_URI;
 
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 const inProduction = process.env.NODE_ENV === 'production';

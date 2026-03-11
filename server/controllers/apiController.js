@@ -2,41 +2,50 @@ const apiRouter = require('express').Router();
 const Person = require('../models/personModel');
 const { parsePhoneNumber, isValidPhoneNumber } = require('libphonenumber-js');
 
+// Escape special regex characters to prevent ReDoS and injection
+const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // Function to normalize phone numbers to consistent international format
 const normalizePhoneNumber = (number) => {
   try {
     if (!number || !isValidPhoneNumber(number)) {
-      return number; // Return as-is if invalid, let validation handle it
+      return number;
     }
 
     const phoneNumber = parsePhoneNumber(number);
-    if (phoneNumber && phoneNumber.isValid()) {
-      // Format in international format with spaces (e.g., +358 40 123 4567)
-      // This ensures consistent storage format across all countries
+    if (phoneNumber?.isValid()) {
       return phoneNumber.formatInternational();
     }
 
-    return number; // Return as-is if parsing fails
+    return number;
   } catch (_error) {
-    return number; // Return as-is if any error occurs
+    return number;
   }
 };
 
+// Normalize Finnish mobile numbers (remove leading zero after country code)
+const normalizeFinnishNumber = (number) => {
+  if (number.startsWith('+358 0') && /^\+358 0[4-5]\d/.test(number)) {
+    return number.replace('+358 0', '+358 ');
+  }
+  return number;
+};
+
 // Get all persons
-apiRouter.get('/persons', async (request, response) => {
+apiRouter.get('/persons', async (request, response, next) => {
   try {
     const page = parseInt(request.query.page) || 1;
-    const limit = parseInt(request.query.limit) || 10;
+    const limit = parseInt(request.query.limit) || 1000;
     const search = request.query.search;
 
     let query = {};
 
-    // Add search functionality
     if (search) {
+      const safeSearch = escapeRegex(search);
       query = {
         $or: [
-          { firstName: { $regex: search, $options: 'i' } },
-          { lastName: { $regex: search, $options: 'i' } }
+          { firstName: { $regex: safeSearch, $options: 'i' } },
+          { lastName: { $regex: safeSearch, $options: 'i' } }
         ]
       };
     }
@@ -57,8 +66,7 @@ apiRouter.get('/persons', async (request, response) => {
 
     response.json({ persons, pagination });
   } catch (error) {
-    console.log('error', error);
-    response.status(500).json({ error: 'internal server error' });
+    next(error);
   }
 });
 
@@ -86,20 +94,9 @@ apiRouter.post('/persons', async (request, response, next) => {
     });
   }
 
-  // Normalize Finnish phone numbers - remove leading zero if it's a mobile number
-  // Finnish mobile numbers should not include leading zero in international format
-  if (number.startsWith('+358 0') && /^\+358 0[4-5]\d/.test(number)) {
-    number = number.replace('+358 0', '+358 ');
-  }
+  number = normalizePhoneNumber(normalizeFinnishNumber(number));
 
-  // Normalize phone number to consistent international format using libphonenumber-js
-  number = normalizePhoneNumber(number);
-
-  const person = new Person({
-    firstName,
-    lastName,
-    number,
-  });
+  const person = new Person({ firstName, lastName, number });
 
   try {
     const savedPerson = await person.save();
@@ -109,28 +106,16 @@ apiRouter.post('/persons', async (request, response, next) => {
   }
 });
 
-// Update a person's number
+// Update a person
 apiRouter.put('/persons/:id', async (request, response, next) => {
   let { firstName, lastName, number } = request.body;
 
-  // Initialize the update object
   const updateData = {};
-
-  if (firstName) {
-    updateData.firstName = firstName;
-  }
-
-  if (lastName) {
-    updateData.lastName = lastName;
-  }
+  if (firstName) updateData.firstName = firstName;
+  if (lastName) updateData.lastName = lastName;
 
   if (number) {
-    // Apply Finnish number normalization for consistency
-    if (number.startsWith('+358 0') && /^\+358 0[4-5]\d/.test(number)) {
-      number = number.replace('+358 0', '+358 ');
-    }
-    // Normalize phone number to consistent international format
-    updateData.number = normalizePhoneNumber(number);
+    updateData.number = normalizePhoneNumber(normalizeFinnishNumber(number));
   }
 
   try {
@@ -152,7 +137,7 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
     const updatedPerson = await Person.findByIdAndUpdate(
       request.params.id,
       updateData,
-      { new: true, runValidators: true, context: 'query' },
+      { returnDocument: 'after', runValidators: true, context: 'query' },
     );
     if (updatedPerson) {
       response.json(updatedPerson);
@@ -171,16 +156,15 @@ apiRouter.delete('/persons/:id', async (request, response, next) => {
     if (deletedPerson) {
       response.status(204).end();
     } else {
-      response.status(404).send({ error: 'person not found' });
+      response.status(404).json({ error: 'person not found' });
     }
   } catch (error) {
-    console.error(error);
     next(error);
   }
 });
 
 // Get statistics
-apiRouter.get('/stats', async (request, response) => {
+apiRouter.get('/stats', async (request, response, next) => {
   try {
     const totalPersons = await Person.countDocuments({});
     const recentPersons = await Person.find({})
@@ -193,8 +177,7 @@ apiRouter.get('/stats', async (request, response) => {
       timestamp: new Date()
     });
   } catch (error) {
-    console.log('error', error);
-    response.status(500).json({ error: 'internal server error' });
+    next(error);
   }
 });
 
