@@ -1,10 +1,10 @@
-const apiRouter = require('express').Router();
+const healthRouter = require('express').Router();
 const mongoose = require('mongoose');
 const Person = require('../models/personModel');
 const os = require('os');
 
 // Health check endpoint
-apiRouter.get('/health', async (req, res) => {
+healthRouter.get('/health', async (req, res) => {
   try {
     // Check database connection
     const dbStatus = mongoose.connection.readyState;
@@ -61,7 +61,7 @@ apiRouter.get('/health', async (req, res) => {
 });
 
 // Readiness check endpoint (for container orchestration)
-apiRouter.get('/ready', async (req, res) => {
+healthRouter.get('/ready', async (req, res) => {
   try {
     // Simple check to see if the application can handle requests
     await Person.findOne().limit(1);
@@ -80,7 +80,7 @@ apiRouter.get('/ready', async (req, res) => {
 });
 
 // Liveness check endpoint (for container orchestration)
-apiRouter.get('/live', (req, res) => {
+healthRouter.get('/live', (req, res) => {
   res.status(200).json({
     status: 'alive',
     timestamp: new Date().toISOString(),
@@ -88,4 +88,4 @@ apiRouter.get('/live', (req, res) => {
   });
 });
 
-module.exports = apiRouter;
+module.exports = healthRouter;

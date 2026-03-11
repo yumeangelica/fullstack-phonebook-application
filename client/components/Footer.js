@@ -3,7 +3,7 @@ const Footer = () => {
 
   return (
     <div className="footer">
-      <label>© 2023 - {currentYear} yumeangelica.github.io. All Rights Reserved.</label>
+      <p>© 2023 - {currentYear} yumeangelica.github.io. All Rights Reserved.</p>
     </div>
   );
 };

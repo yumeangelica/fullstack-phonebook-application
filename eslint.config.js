@@ -1,23 +1,33 @@
 const js = require('@eslint/js');
 const globals = require('globals');
+const reactPlugin = require('eslint-plugin-react');
+const reactHooksPlugin = require('eslint-plugin-react-hooks');
 
 module.exports = [
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
+    },
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
       globals: {
         ...globals.node,
         ...globals.commonjs,
-        ...globals.jest,
         ...globals.browser,
       },
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
         },
+      },
+    },
+    settings: {
+      react: {
+        version: 'detect',
       },
     },
     rules: {
@@ -40,7 +50,13 @@ module.exports = [
           ignoreConsecutiveComments: true,
         },
       ],
-      complexity: ['warn', { max: 40 }],
+      complexity: ['warn', { max: 20 }],
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
   {
@@ -48,7 +64,6 @@ module.exports = [
       'build/**',
       'node_modules/**',
       'coverage/**',
-      'client/**',
       'dist/**',
       '.env',
       '.DS_Store',

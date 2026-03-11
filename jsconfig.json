@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "allowSyntheticDefaultImports": false,
+    "target": "es2022",
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
+    "checkJs": false
   },
   "exclude": ["node_modules", "build", "dist"]
 }

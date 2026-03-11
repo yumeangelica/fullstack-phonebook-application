@@ -1,8 +1,4 @@
-const Filter = ({ handleFilterChange, newFilter }) => {
-  const clearFilter = () => {
-    handleFilterChange({ target: { value: '' } });
-  };
-
+const Filter = ({ newFilter, onFilterChange }) => {
   return (
     <div className="filter-container">
       <div className="filter-content">
@@ -15,7 +11,7 @@ const Filter = ({ handleFilterChange, newFilter }) => {
               id="filterInput"
               type="text"
               className="filter-input"
-              onChange={handleFilterChange}
+              onChange={(e) => onFilterChange(e.target.value)}
               value={newFilter}
               placeholder="Search by name or phone number..."
               aria-describedby="filter-help"
@@ -24,7 +20,7 @@ const Filter = ({ handleFilterChange, newFilter }) => {
               <button
                 type="button"
                 className="filter-clear-btn"
-                onClick={clearFilter}
+                onClick={() => onFilterChange('')}
                 aria-label="Clear search filter"
                 title="Clear filter"
               >
@@ -32,7 +28,7 @@ const Filter = ({ handleFilterChange, newFilter }) => {
               </button>
             )}
           </div>
-          <small id="filter-help" style={{ fontSize: '13px', marginTop: '8px', color: 'var(--text-gray)' }}>
+          <small id="filter-help" className="filter-help-text">
             {newFilter ? `Showing results for "${newFilter}"` : 'Type to search through your contacts'}
           </small>
         </div>

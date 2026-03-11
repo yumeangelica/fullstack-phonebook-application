@@ -1,22 +1,34 @@
 const baseURL = '/api';
 const personsEndpoint = '/persons';
 
+const DEFAULT_TIMEOUT = 10000;
+
 const request = async (url, options = {}) => {
-  const response = await fetch(`${baseURL}${url}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || DEFAULT_TIMEOUT);
 
-  const isJson = response.headers.get('content-type')?.includes('application/json');
-  const data = isJson ? await response.json() : null;
+  try {
+    const headers = options.body ? { 'Content-Type': 'application/json' } : {};
 
-  if (!response.ok) {
-    const error = new Error(data?.error || response.statusText);
-    error.response = { data, status: response.status };
-    throw error;
+    const response = await fetch(`${baseURL}${url}`, {
+      ...options,
+      headers: { ...headers, ...options.headers },
+      signal: controller.signal,
+    });
+
+    const isJson = response.headers.get('content-type')?.includes('application/json');
+    const data = isJson ? await response.json() : null;
+
+    if (!response.ok) {
+      const error = new Error(data?.error || response.statusText);
+      error.response = { data, status: response.status };
+      throw error;
+    }
+
+    return { data, status: response.status };
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return { data, status: response.status };
 };
 
 const getAllPersons = () => request(personsEndpoint);

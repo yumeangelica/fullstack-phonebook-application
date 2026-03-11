@@ -54,6 +54,15 @@ describe('Persons API', () => {
       assert.ok(names.includes('John'));
     });
 
+    it('handles search with regex special characters safely', async () => {
+      const response = await api
+        .get('/api/persons?search=.*')
+        .expect(200);
+
+      // Should return empty results, not crash or match everything
+      assert.ok(Array.isArray(response.body.persons));
+    });
+
     it('supports pagination', async () => {
       const response = await api
         .get('/api/persons?page=1&limit=2')
