@@ -31,7 +31,7 @@ const App = () => {
         person.number.includes(newFilter)
       );
     }),
-  [persons, newFilter]
+    [persons, newFilter]
   );
 
   const resetForm = useCallback(() => {
