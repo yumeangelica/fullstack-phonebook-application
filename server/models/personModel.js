@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { isValidPhoneNumber } = require('libphonenumber-js');
+const { Schema } = mongoose;
 
 // Shared transform for JSON and Object serialization
 const idTransform = (doc, ret) => {
@@ -83,15 +84,20 @@ const personSchema = new mongoose.Schema({
     required: [true, 'Phone number is required'],
     trim: true,
   },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
 }, {
   timestamps: true,
   toJSON: { transform: idTransform },
   toObject: { transform: idTransform },
 });
 
-// Database indexing for performance optimization and data integrity
-personSchema.index({ firstName: 1, lastName: 1 }, { unique: true });
-personSchema.index({ number: 1 }, { unique: true });
+// Database indexing — unique per user (different users can have same contacts)
+personSchema.index({ firstName: 1, lastName: 1, user: 1 }, { unique: true });
+personSchema.index({ number: 1, user: 1 }, { unique: true });
 
 // Virtual field for computed full name without storing redundant data
 personSchema.virtual('fullName').get(function () {

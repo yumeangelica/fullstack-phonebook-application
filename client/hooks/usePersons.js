@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import apiService from '../services/api';
 
-const usePersons = (showNotification) => {
+const usePersons = (showNotification, user) => {
   const [persons, setPersons] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      setPersons([]);
+      setLoading(false);
+      return;
+    }
+
     const fetchPersons = async () => {
       try {
         setLoading(true);
@@ -19,7 +25,7 @@ const usePersons = (showNotification) => {
       }
     };
     fetchPersons();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addPerson = useCallback(async (personData) => {
     const { firstName, lastName } = personData;

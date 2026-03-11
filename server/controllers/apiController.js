@@ -1,6 +1,7 @@
 const apiRouter = require('express').Router();
 const Person = require('../models/personModel');
 const { parsePhoneNumber, isValidPhoneNumber } = require('libphonenumber-js');
+const { requireAuth } = require('../middleware/auth');
 
 // Escape special regex characters to prevent ReDoS and injection
 const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -31,23 +32,24 @@ const normalizeFinnishNumber = (number) => {
   return number;
 };
 
-// Get all persons
+// All person routes require authentication
+apiRouter.use(requireAuth);
+
+// Get all persons (scoped to user)
 apiRouter.get('/persons', async (request, response, next) => {
   try {
     const page = parseInt(request.query.page) || 1;
     const limit = parseInt(request.query.limit) || 1000;
     const search = request.query.search;
 
-    let query = {};
+    let query = { user: request.user.id };
 
     if (search) {
       const safeSearch = escapeRegex(search);
-      query = {
-        $or: [
-          { firstName: { $regex: safeSearch, $options: 'i' } },
-          { lastName: { $regex: safeSearch, $options: 'i' } }
-        ]
-      };
+      query.$or = [
+        { firstName: { $regex: safeSearch, $options: 'i' } },
+        { lastName: { $regex: safeSearch, $options: 'i' } }
+      ];
     }
 
     const skip = (page - 1) * limit;
@@ -70,10 +72,10 @@ apiRouter.get('/persons', async (request, response, next) => {
   }
 });
 
-// Get a person by id
+// Get a person by id (scoped to user)
 apiRouter.get('/persons/:id', async (request, response, next) => {
   try {
-    const person = await Person.findById(request.params.id);
+    const person = await Person.findOne({ _id: request.params.id, user: request.user.id });
     if (person) {
       response.json(person);
     } else {
@@ -84,7 +86,7 @@ apiRouter.get('/persons/:id', async (request, response, next) => {
   }
 });
 
-// Add a new person
+// Add a new person (scoped to user)
 apiRouter.post('/persons', async (request, response, next) => {
   let { firstName, lastName, number } = request.body;
 
@@ -96,7 +98,7 @@ apiRouter.post('/persons', async (request, response, next) => {
 
   number = normalizePhoneNumber(normalizeFinnishNumber(number));
 
-  const person = new Person({ firstName, lastName, number });
+  const person = new Person({ firstName, lastName, number, user: request.user.id });
 
   try {
     const savedPerson = await person.save();
@@ -106,7 +108,7 @@ apiRouter.post('/persons', async (request, response, next) => {
   }
 });
 
-// Update a person
+// Update a person (scoped to user)
 apiRouter.put('/persons/:id', async (request, response, next) => {
   let { firstName, lastName, number } = request.body;
 
@@ -119,11 +121,12 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
   }
 
   try {
-    // Check if updating to existing name combination (excluding current person)
+    // Check if updating to existing name combination (excluding current person, scoped to user)
     if (firstName && lastName) {
       const existingPerson = await Person.findOne({
         firstName,
         lastName,
+        user: request.user.id,
         _id: { $ne: request.params.id }
       });
 
@@ -134,8 +137,8 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
       }
     }
 
-    const updatedPerson = await Person.findByIdAndUpdate(
-      request.params.id,
+    const updatedPerson = await Person.findOneAndUpdate(
+      { _id: request.params.id, user: request.user.id },
       updateData,
       { returnDocument: 'after', runValidators: true, context: 'query' },
     );
@@ -149,10 +152,13 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
   }
 });
 
-// Delete a person
+// Delete a person (scoped to user)
 apiRouter.delete('/persons/:id', async (request, response, next) => {
   try {
-    const deletedPerson = await Person.findByIdAndDelete(request.params.id);
+    const deletedPerson = await Person.findOneAndDelete({
+      _id: request.params.id,
+      user: request.user.id,
+    });
     if (deletedPerson) {
       response.status(204).end();
     } else {
@@ -163,11 +169,11 @@ apiRouter.delete('/persons/:id', async (request, response, next) => {
   }
 });
 
-// Get statistics
+// Get statistics (scoped to user)
 apiRouter.get('/stats', async (request, response, next) => {
   try {
-    const totalPersons = await Person.countDocuments({});
-    const recentPersons = await Person.find({})
+    const totalPersons = await Person.countDocuments({ user: request.user.id });
+    const recentPersons = await Person.find({ user: request.user.id })
       .sort({ createdAt: -1 })
       .limit(5);
 

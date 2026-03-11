@@ -4,8 +4,11 @@ import FilteredPersonsShow from './components/FilteredPersonsShow';
 import NewPersonForm from './components/NewPersonsForm';
 import NotificationMessage from './components/NotificationMessage';
 import Footer from './components/Footer';
+import AuthForm from './components/AuthForm';
+import UserHeader from './components/UserHeader';
 import usePersons from './hooks/usePersons';
 import useNotification from './hooks/useNotification';
+import useAuth from './hooks/useAuth';
 
 const App = () => {
   const [newFirstName, setNewFirstName] = useState('');
@@ -16,7 +19,8 @@ const App = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
 
   const { message, isError, showNotification } = useNotification();
-  const { persons, loading, addPerson, removePerson } = usePersons(showNotification);
+  const { user, loading: authLoading, login, register, logout, deleteAccount } = useAuth();
+  const { persons, loading, addPerson, removePerson } = usePersons(showNotification, user);
 
   const filteredPersons = useMemo(() =>
     persons.filter(person => {
@@ -68,9 +72,53 @@ const App = () => {
     setNewNumber(value);
   }, [newCountryCode]);
 
+  const handleLogout = useCallback(() => {
+    logout();
+    showNotification('Signed out successfully', false);
+  }, [logout, showNotification]);
+
+  const handleDeleteAccount = useCallback(async () => {
+    try {
+      await deleteAccount();
+      showNotification('Account deleted', false);
+    } catch (error) {
+      showNotification(error.message || 'Failed to delete account', true);
+    }
+  }, [deleteAccount, showNotification]);
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="container">
+        <h1>Phonebook</h1>
+        <p className="auth-loading-text">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show auth form if not logged in
+  if (!user) {
+    return (
+      <div className="container">
+        <NotificationMessage notificationMessage={message} errorHappened={isError} />
+        <AuthForm
+          onLogin={login}
+          onRegister={register}
+          showNotification={showNotification}
+        />
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       <h1>Phonebook</h1>
+      <UserHeader
+        username={user.username}
+        onLogout={handleLogout}
+        onDeleteAccount={handleDeleteAccount}
+      />
       <NotificationMessage notificationMessage={message} errorHappened={isError} />
 
       <Filter
