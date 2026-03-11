@@ -23,6 +23,12 @@ const errorHandler = (error, request, response, _next) => {
     const field = Object.keys(error.keyValue)[0];
     const value = error.keyValue[field];
 
+    if (field === 'username') {
+      return response.status(409).json({
+        error: 'Username already taken'
+      });
+    }
+
     if (field === 'number') {
       return response.status(409).json({
         error: 'Phone number already exists'

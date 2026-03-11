@@ -7,6 +7,8 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
+
 const inProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
@@ -14,4 +16,5 @@ module.exports = {
   MONGODB_URI,
   PORT,
   ALLOWED_ORIGINS,
+  JWT_SECRET,
 };

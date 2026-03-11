@@ -2,13 +2,20 @@ const { describe, it, before, after, beforeEach } = require('node:test');
 const assert = require('node:assert');
 const { connectDB, disconnectDB } = require('./setup');
 const Person = require('../models/personModel');
+const User = require('../models/userModel');
+const helper = require('./test-helper');
 
 describe('Person model', () => {
+  let userId;
+
   before(async () => { await connectDB(); });
   after(async () => { await disconnectDB(); });
 
   beforeEach(async () => {
     await Person.deleteMany({});
+    await User.deleteMany({});
+    const auth = await helper.createTestUser();
+    userId = auth.user.id;
   });
 
   describe('Validation', () => {
@@ -16,7 +23,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'John',
         lastName: 'Doe',
-        number: '+358 40-1234567'
+        number: '+358 40-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -32,7 +40,8 @@ describe('Person model', () => {
       const personData = {
         firstName: '  Jane  ',
         lastName: '  Smith  ',
-        number: '  +358 44-9876543  '
+        number: '  +358 44-9876543  ',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -46,7 +55,8 @@ describe('Person model', () => {
     it('requires firstName', async () => {
       const personData = {
         lastName: 'Doe',
-        number: '+358 40-1234567'
+        number: '+358 40-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -56,7 +66,8 @@ describe('Person model', () => {
     it('requires lastName', async () => {
       const personData = {
         firstName: 'John',
-        number: '+358 40-1234567'
+        number: '+358 40-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -66,7 +77,8 @@ describe('Person model', () => {
     it('requires number', async () => {
       const personData = {
         firstName: 'John',
-        lastName: 'Doe'
+        lastName: 'Doe',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -77,7 +89,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'Jo',
         lastName: 'Doe',
-        number: '+358 40-1234567'
+        number: '+358 40-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -88,7 +101,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'John',
         lastName: 'Do',
-        number: '+358 40-1234567'
+        number: '+358 40-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -99,7 +113,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'John',
         lastName: 'Doe',
-        number: '+358 12'
+        number: '+358 12',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -110,7 +125,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'J'.repeat(51),
         lastName: 'Doe',
-        number: '+358 40-1234567'
+        number: '+358 40-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -121,7 +137,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'John',
         lastName: 'Doe',
-        number: 'invalid-number'
+        number: 'invalid-number',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -146,7 +163,8 @@ describe('Person model', () => {
         const personData = {
           firstName: 'John',
           lastName: lastNames[i],
-          number
+          number,
+          user: userId,
         };
 
         const person = new Person(personData);
@@ -162,7 +180,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'Alice',
         lastName: 'Smith',
-        number: '+358 41-1234567'
+        number: '+358 41-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -177,7 +196,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'Bob',
         lastName: 'Wilson',
-        number: '+358 42-1234567'
+        number: '+358 42-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -191,11 +211,12 @@ describe('Person model', () => {
   });
 
   describe('Indexes', () => {
-    it('enforces unique firstName and lastName combination', async () => {
+    it('enforces unique firstName and lastName combination per user', async () => {
       const personData = {
         firstName: 'Charlie',
         lastName: 'Brown',
-        number: '+358 43-1234567'
+        number: '+358 43-1234567',
+        user: userId,
       };
 
       const person1 = new Person(personData);
@@ -204,18 +225,20 @@ describe('Person model', () => {
       const duplicatePersonData = {
         firstName: 'Charlie',
         lastName: 'Brown',
-        number: '+358 50-9876543'
+        number: '+358 50-9876543',
+        user: userId,
       };
 
       const person2 = new Person(duplicatePersonData);
       await assert.rejects(() => person2.save());
     });
 
-    it('enforces unique phone number', async () => {
+    it('enforces unique phone number per user', async () => {
       const personData1 = {
         firstName: 'David',
         lastName: 'Miller',
-        number: '+358 45-1234567'
+        number: '+358 45-1234567',
+        user: userId,
       };
 
       const person1 = new Person(personData1);
@@ -224,7 +247,8 @@ describe('Person model', () => {
       const personData2 = {
         firstName: 'Jane',
         lastName: 'Smith',
-        number: '+358 45-1234567'
+        number: '+358 45-1234567',
+        user: userId,
       };
 
       const person2 = new Person(personData2);
@@ -237,7 +261,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'Emma',
         lastName: 'Johnson',
-        number: '+358 46-1234567'
+        number: '+358 46-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);
@@ -253,7 +278,8 @@ describe('Person model', () => {
       const personData = {
         firstName: 'Frank',
         lastName: 'Garcia',
-        number: '+358 47-1234567'
+        number: '+358 47-1234567',
+        user: userId,
       };
 
       const person = new Person(personData);

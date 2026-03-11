@@ -4,37 +4,60 @@ const supertest = require('supertest');
 const { connectDB, disconnectDB } = require('./setup');
 const app = require('../app');
 const Person = require('../models/personModel');
+const User = require('../models/userModel');
 const helper = require('./test-helper');
 
 const api = supertest(app);
 
 describe('Persons API', () => {
+  let token;
+  let userId;
+
   before(async () => { await connectDB(); });
   after(async () => { await disconnectDB(); });
 
   beforeEach(async () => {
     await Person.deleteMany({});
+    await User.deleteMany({});
 
-    const personObjects = helper.initialPersons.map(person => new Person(person));
-    const promiseArray = personObjects.map(person => person.save());
-    await Promise.all(promiseArray);
+    // Create a test user and get token
+    const auth = await helper.createTestUser();
+    token = auth.token;
+    userId = auth.user.id;
+
+    // Seed persons with user reference
+    const personObjects = helper.initialPersons.map(
+      person => new Person({ ...person, user: userId })
+    );
+    await Promise.all(personObjects.map(person => person.save()));
   });
 
   describe('GET /api/persons', () => {
     it('returns persons as JSON', async () => {
       await api
         .get('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200)
         .expect('Content-Type', /application\/json/);
     });
 
+    it('returns 401 without token', async () => {
+      await api
+        .get('/api/persons')
+        .expect(401);
+    });
+
     it('returns correct number of persons', async () => {
-      const response = await api.get('/api/persons');
+      const response = await api
+        .get('/api/persons')
+        .set('Authorization', `Bearer ${token}`);
       assert.strictEqual(response.body.persons.length, helper.initialPersons.length);
     });
 
     it('returns persons with pagination info', async () => {
-      const response = await api.get('/api/persons');
+      const response = await api
+        .get('/api/persons')
+        .set('Authorization', `Bearer ${token}`);
 
       assert.ok('persons' in response.body);
       assert.ok('pagination' in response.body);
@@ -47,6 +70,7 @@ describe('Persons API', () => {
     it('supports search functionality', async () => {
       const response = await api
         .get('/api/persons?search=John')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       assert.strictEqual(response.body.persons.length, 2);
@@ -57,6 +81,7 @@ describe('Persons API', () => {
     it('handles search with regex special characters safely', async () => {
       const response = await api
         .get('/api/persons?search=.*')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       // Should return empty results, not crash or match everything
@@ -66,11 +91,27 @@ describe('Persons API', () => {
     it('supports pagination', async () => {
       const response = await api
         .get('/api/persons?page=1&limit=2')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       assert.ok(response.body.persons.length <= 2);
       assert.strictEqual(response.body.pagination.page, 1);
       assert.strictEqual(response.body.pagination.limit, 2);
+    });
+
+    it('does not return other users persons', async () => {
+      // Create another user with a person
+      const otherAuth = await helper.createTestUser({ username: 'otheruser', password: 'otherpassword123' });
+      await new Person({ firstName: 'Other', lastName: 'Person', number: '+358 40 9999999', user: otherAuth.user.id }).save();
+
+      const response = await api
+        .get('/api/persons')
+        .set('Authorization', `Bearer ${token}`);
+
+      // Should only see original user's persons, not the other user's
+      assert.strictEqual(response.body.persons.length, helper.initialPersons.length);
+      const names = response.body.persons.map(p => p.firstName);
+      assert.ok(!names.includes('Other'));
     });
   });
 
@@ -81,11 +122,13 @@ describe('Persons API', () => {
 
       const resultPerson = await api
         .get(`/api/persons/${personToView.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200)
         .expect('Content-Type', /application\/json/);
 
       const expectedPerson = {
         ...personToView,
+        user: personToView.user.toString(),
         createdAt: personToView.createdAt.toISOString(),
         updatedAt: personToView.updatedAt.toISOString()
       };
@@ -94,10 +137,11 @@ describe('Persons API', () => {
     });
 
     it('returns 404 if person does not exist', async () => {
-      const validNonexistingId = await helper.nonExistingId();
+      const validNonexistingId = await helper.nonExistingId(userId);
 
       await api
         .get(`/api/persons/${validNonexistingId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
     });
 
@@ -106,6 +150,7 @@ describe('Persons API', () => {
 
       await api
         .get(`/api/persons/${invalidId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400);
     });
   });
@@ -120,6 +165,7 @@ describe('Persons API', () => {
 
       await api
         .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
         .send(newPerson)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -138,6 +184,7 @@ describe('Persons API', () => {
 
       const result = await api
         .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
         .send(newPerson)
         .expect(400);
 
@@ -152,6 +199,7 @@ describe('Persons API', () => {
 
       const result = await api
         .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
         .send(newPerson)
         .expect(400);
 
@@ -167,6 +215,7 @@ describe('Persons API', () => {
 
       const result = await api
         .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
         .send(newPerson)
         .expect(400);
 
@@ -182,6 +231,7 @@ describe('Persons API', () => {
 
       const result = await api
         .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
         .send(existingPerson)
         .expect(409);
 
@@ -197,6 +247,7 @@ describe('Persons API', () => {
 
       const result = await api
         .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
         .send(existingNumber)
         .expect(409);
 
@@ -217,6 +268,7 @@ describe('Persons API', () => {
 
       const result = await api
         .put(`/api/persons/${personToUpdate.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(updatedData)
         .expect(200)
         .expect('Content-Type', /application\/json/);
@@ -227,7 +279,7 @@ describe('Persons API', () => {
     });
 
     it('returns 404 if person does not exist', async () => {
-      const validNonexistingId = await helper.nonExistingId();
+      const validNonexistingId = await helper.nonExistingId(userId);
 
       const updatedData = {
         firstName: 'Updated',
@@ -237,6 +289,7 @@ describe('Persons API', () => {
 
       await api
         .put(`/api/persons/${validNonexistingId}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(updatedData)
         .expect(404);
     });
@@ -249,6 +302,7 @@ describe('Persons API', () => {
 
       await api
         .delete(`/api/persons/${personToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204);
 
       const personsAtEnd = await helper.personsInDb();
@@ -259,10 +313,11 @@ describe('Persons API', () => {
     });
 
     it('returns 404 if person does not exist', async () => {
-      const validNonexistingId = await helper.nonExistingId();
+      const validNonexistingId = await helper.nonExistingId(userId);
 
       await api
         .delete(`/api/persons/${validNonexistingId}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(404);
     });
   });
@@ -271,6 +326,7 @@ describe('Persons API', () => {
     it('returns statistics', async () => {
       const result = await api
         .get('/api/stats')
+        .set('Authorization', `Bearer ${token}`)
         .expect(200)
         .expect('Content-Type', /application\/json/);
 

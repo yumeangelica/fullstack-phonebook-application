@@ -3,6 +3,7 @@ const cors = require('cors');
 const { unknownEndpoint, errorHandler, httpLogger, createRateLimiter, securityHeaders } = require('./middleware/index');
 const indexRouter = require('./controllers/indexController');
 const apiRouter = require('./controllers/apiController');
+const authRouter = require('./controllers/authController');
 const healthRouter = require('./controllers/healthController');
 const { inProduction, ALLOWED_ORIGINS } = require('./utils/config');
 const path = require('path');
@@ -27,6 +28,7 @@ if (inProduction) {
 
 app.use(httpLogger);
 
+app.use('/api/auth', authRouter);
 app.use('/api', apiRouter);
 app.use('/', healthRouter);
 app.use('/', indexRouter);
