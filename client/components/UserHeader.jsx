@@ -1,8 +1,14 @@
+import useConfirm from '../hooks/useConfirm';
+
 const UserHeader = ({ username, onLogout, onDeleteAccount }) => {
-  const handleDeleteAccount = () => {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete your account? This will permanently remove all your contacts.',
-    );
+  const confirm = useConfirm();
+
+  const handleDeleteAccount = async () => {
+    const confirmed = await confirm({
+      message:
+        'Are you sure you want to delete your account? This will permanently remove all your contacts.',
+      confirmLabel: 'Delete account',
+    });
     if (confirmed) {
       onDeleteAccount();
     }

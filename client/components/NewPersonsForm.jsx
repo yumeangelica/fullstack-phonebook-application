@@ -1,3 +1,4 @@
+import useConfirm from '../hooks/useConfirm';
 import {
   countryCodes,
   validateFirstName,
@@ -16,13 +17,16 @@ const NewPersonForm = ({
   handleNumberChange,
   handleCountryCodeChange,
 }) => {
-  const clearForm = () => {
+  const confirm = useConfirm();
+
+  const clearForm = async () => {
     const hasContent = newFirstName || newLastName || newNumber;
 
     if (hasContent) {
-      const confirmClear = window.confirm(
-        'Are you sure you want to clear all fields?',
-      );
+      const confirmClear = await confirm({
+        message: 'Are you sure you want to clear all fields?',
+        confirmLabel: 'Clear',
+      });
       if (!confirmClear) return;
     }
 

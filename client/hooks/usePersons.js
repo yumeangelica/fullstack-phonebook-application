@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import apiService from '../services/api';
+import useConfirm from './useConfirm';
 
 const usePersons = (showNotification, user) => {
   const [persons, setPersons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const confirm = useConfirm();
 
   useEffect(() => {
     if (!user) {
@@ -25,8 +27,7 @@ const usePersons = (showNotification, user) => {
       }
     };
     fetchPersons();
-    // Refetch only when the user changes; showNotification is intentionally omitted
-    // biome-ignore lint/correctness/useExhaustiveDependencies: stable notification handler, refetch keyed on user
+    // biome-ignore lint/correctness/useExhaustiveDependencies: refetch is intentionally keyed on user; showNotification is stable
   }, [user]);
 
   const addPerson = useCallback(
@@ -38,9 +39,10 @@ const usePersons = (showNotification, user) => {
       );
 
       if (existingPerson) {
-        const confirmUpdate = window.confirm(
-          `${firstName} ${lastName} is already added to phonebook, replace the old number with a new one?`,
-        );
+        const confirmUpdate = await confirm({
+          message: `${firstName} ${lastName} is already added to phonebook, replace the old number with a new one?`,
+          confirmLabel: 'Replace',
+        });
         if (!confirmUpdate) return;
 
         const response = await apiService.updatePerson(
@@ -57,7 +59,7 @@ const usePersons = (showNotification, user) => {
         showNotification(`Added ${firstName} ${lastName}`, false);
       }
     },
-    [persons, showNotification],
+    [persons, showNotification, confirm],
   );
 
   const removePerson = useCallback(
@@ -65,9 +67,10 @@ const usePersons = (showNotification, user) => {
       const person = persons.find((p) => p.id === id);
       if (!person) return;
 
-      const confirmDeletion = window.confirm(
-        `Delete ${person.firstName} ${person.lastName}?`,
-      );
+      const confirmDeletion = await confirm({
+        message: `Delete ${person.firstName} ${person.lastName}?`,
+        confirmLabel: 'Delete',
+      });
       if (!confirmDeletion) return;
 
       try {
@@ -84,7 +87,7 @@ const usePersons = (showNotification, user) => {
         );
       }
     },
-    [persons, showNotification],
+    [persons, showNotification, confirm],
   );
 
   return { persons, loading, addPerson, removePerson };

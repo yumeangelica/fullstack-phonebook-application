@@ -911,3 +911,84 @@ h1 {
     width: 100%;
   }
 }
+
+/* ==========================================================================
+   Error boundary
+   ========================================================================== */
+
+.error-boundary {
+  text-align: center;
+  color: var(--text-gray);
+  padding: var(--spacing-2xl) 0;
+}
+
+.error-boundary p {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ==========================================================================
+   Confirm dialog
+   ========================================================================== */
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  padding: var(--spacing-xl);
+  z-index: 1000;
+}
+
+.confirm-dialog {
+  background: var(--bg-white-solid);
+  border: 1px solid var(--border-gray);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: var(--spacing-2xl);
+  max-width: 420px;
+  width: 100%;
+}
+
+.confirm-dialog-message {
+  margin: 0 0 var(--spacing-xl);
+  color: var(--text-gray);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+.confirm-dialog-btn {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: 8px;
+  border: 1px solid var(--border-gray);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.confirm-dialog-cancel {
+  background: var(--bg-white);
+  color: var(--text-gray);
+}
+
+.confirm-dialog-confirm {
+  background: var(--primary-pink);
+  border-color: var(--primary-pink);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .confirm-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .confirm-dialog-btn {
+    width: 100%;
+  }
+}
