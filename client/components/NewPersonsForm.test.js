@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import { describe, it } from 'node:test';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ConfirmProvider } from '../hooks/useConfirm';
 import NewPersonsForm from './NewPersonsForm';
 
 describe('<NewPersonsForm />', () => {
@@ -24,7 +25,11 @@ describe('<NewPersonsForm />', () => {
 
     await act(async () => {
       root = createRoot(container);
-      root.render(<NewPersonsForm {...mockProps} />);
+      root.render(
+        <ConfirmProvider>
+          <NewPersonsForm {...mockProps} />
+        </ConfirmProvider>,
+      );
     });
 
     assert.ok(container.textContent.includes('Add a new contact'));

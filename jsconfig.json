@@ -3,7 +3,6 @@
     "target": "es2022",
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./",
     "checkJs": false
   },
   "exclude": ["node_modules", "build", "dist"]

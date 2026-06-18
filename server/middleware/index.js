@@ -137,6 +137,21 @@ const securityHeaders = (_req, res, next) => {
     'Strict-Transport-Security',
     'max-age=31536000; includeSubDomains',
   );
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  res.setHeader(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      // Inline styles are needed for the bundled CSS and runtime style attributes
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "frame-ancestors 'none'",
+    ].join('; '),
+  );
   next();
 };
 
