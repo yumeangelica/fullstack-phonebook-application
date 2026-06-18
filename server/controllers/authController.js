@@ -98,12 +98,19 @@ authRouter.get('/me', requireAuth, async (request, response, next) => {
 // Delete account + all user's persons (cascade)
 authRouter.delete('/me', requireAuth, async (request, response, next) => {
   try {
-    await Person.deleteMany({ user: request.user.id });
+    const { deletedCount } = await Person.deleteMany({
+      user: request.user.id,
+    });
     const deletedUser = await User.findByIdAndDelete(request.user.id);
 
     if (!deletedUser) {
       return response.status(404).json({ error: 'User not found' });
     }
+
+    // Audit log for a destructive operation (no personal data, only ids/counts)
+    console.info(
+      `AUDIT account deleted: userId=${request.user.id} contactsRemoved=${deletedCount}`,
+    );
 
     response.status(204).end();
   } catch (error) {
