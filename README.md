@@ -62,6 +62,7 @@ PORT=5001
 ```
 
 `JWT_SECRET` is required in production; the server refuses to start without a secure value.
+`TEST_MONGODB_URI` must point to a separate test database because backend tests delete data.
 
 ### Development
 

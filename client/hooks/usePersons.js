@@ -27,8 +27,7 @@ const usePersons = (showNotification, user) => {
       }
     };
     fetchPersons();
-    // biome-ignore lint/correctness/useExhaustiveDependencies: refetch is intentionally keyed on user; showNotification is stable
-  }, [user]);
+  }, [user, showNotification]);
 
   const addPerson = useCallback(
     async (personData) => {

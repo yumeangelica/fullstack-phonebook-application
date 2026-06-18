@@ -107,6 +107,25 @@ describe('Auth API', () => {
       assert.strictEqual(result.body.username, helper.testUser.username);
     });
 
+    it('accepts different casing and surrounding whitespace in username', async () => {
+      await helper.createTestUser({
+        username: 'caseuser',
+        password: helper.testUser.password,
+      });
+
+      const result = await api
+        .post('/api/auth/login')
+        .send({
+          username: '  CASEUSER  ',
+          password: helper.testUser.password,
+        })
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+
+      assert.ok(result.body.token);
+      assert.strictEqual(result.body.username, 'caseuser');
+    });
+
     it('returns 401 with wrong password', async () => {
       await helper.createTestUser();
 
