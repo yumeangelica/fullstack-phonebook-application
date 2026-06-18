@@ -1,6 +1,9 @@
 const app = require('./server/app');
 const { MONGODB_URI, PORT } = require('./server/utils/config');
-const { connectToMongoDB, disconnectFromMongoDB } = require('./server/utils/database');
+const {
+  connectToMongoDB,
+  disconnectFromMongoDB,
+} = require('./server/utils/database');
 
 const startServer = async () => {
   try {
@@ -8,7 +11,9 @@ const startServer = async () => {
 
     const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📍 Health check available at http://localhost:${PORT}/health`);
+      console.log(
+        `📍 Health check available at http://localhost:${PORT}/health`,
+      );
       console.log(`🌐 API available at http://localhost:${PORT}/api`);
     });
 
@@ -24,7 +29,6 @@ const startServer = async () => {
 
     process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
   } catch (error) {
     console.error('💀 Failed to start server:', error.message);
     process.exit(1);

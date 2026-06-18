@@ -38,17 +38,19 @@ apiRouter.use(requireAuth);
 // Get all persons (scoped to user)
 apiRouter.get('/persons', async (request, response, next) => {
   try {
-    const page = parseInt(request.query.page) || 1;
-    const limit = parseInt(request.query.limit) || 1000;
+    const MAX_LIMIT = 100;
+    const page = Math.max(parseInt(request.query.page, 10) || 1, 1);
+    const requestedLimit = parseInt(request.query.limit, 10) || MAX_LIMIT;
+    const limit = Math.min(Math.max(requestedLimit, 1), MAX_LIMIT);
     const search = request.query.search;
 
-    let query = { user: request.user.id };
+    const query = { user: request.user.id };
 
     if (search) {
       const safeSearch = escapeRegex(search);
       query.$or = [
         { firstName: { $regex: safeSearch, $options: 'i' } },
-        { lastName: { $regex: safeSearch, $options: 'i' } }
+        { lastName: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 
@@ -63,7 +65,7 @@ apiRouter.get('/persons', async (request, response, next) => {
       page,
       limit,
       total,
-      pages: Math.ceil(total / limit)
+      pages: Math.ceil(total / limit),
     };
 
     response.json({ persons, pagination });
@@ -75,7 +77,10 @@ apiRouter.get('/persons', async (request, response, next) => {
 // Get a person by id (scoped to user)
 apiRouter.get('/persons/:id', async (request, response, next) => {
   try {
-    const person = await Person.findOne({ _id: request.params.id, user: request.user.id });
+    const person = await Person.findOne({
+      _id: request.params.id,
+      user: request.user.id,
+    });
     if (person) {
       response.json(person);
     } else {
@@ -98,7 +103,12 @@ apiRouter.post('/persons', async (request, response, next) => {
 
   number = normalizePhoneNumber(normalizeFinnishNumber(number));
 
-  const person = new Person({ firstName, lastName, number, user: request.user.id });
+  const person = new Person({
+    firstName,
+    lastName,
+    number,
+    user: request.user.id,
+  });
 
   try {
     const savedPerson = await person.save();
@@ -110,7 +120,7 @@ apiRouter.post('/persons', async (request, response, next) => {
 
 // Update a person (scoped to user)
 apiRouter.put('/persons/:id', async (request, response, next) => {
-  let { firstName, lastName, number } = request.body;
+  const { firstName, lastName, number } = request.body;
 
   const updateData = {};
   if (firstName) updateData.firstName = firstName;
@@ -127,12 +137,12 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
         firstName,
         lastName,
         user: request.user.id,
-        _id: { $ne: request.params.id }
+        _id: { $ne: request.params.id },
       });
 
       if (existingPerson) {
         return response.status(409).json({
-          error: 'Person with this name already exists'
+          error: 'Person with this name already exists',
         });
       }
     }
@@ -180,7 +190,7 @@ apiRouter.get('/stats', async (request, response, next) => {
     response.json({
       totalPersons,
       recentPersons,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } catch (error) {
     next(error);

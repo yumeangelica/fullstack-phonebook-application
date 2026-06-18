@@ -18,13 +18,16 @@ const clearToken = () => {
 
 const request = async (url, options = {}) => {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), options.timeout || DEFAULT_TIMEOUT);
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    options.timeout || DEFAULT_TIMEOUT,
+  );
 
   try {
     const headers = options.body ? { 'Content-Type': 'application/json' } : {};
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers.Authorization = `Bearer ${token}`;
     }
 
     const response = await fetch(`${baseURL}${url}`, {
@@ -33,7 +36,9 @@ const request = async (url, options = {}) => {
       signal: controller.signal,
     });
 
-    const isJson = response.headers.get('content-type')?.includes('application/json');
+    const isJson = response.headers
+      .get('content-type')
+      ?.includes('application/json');
     const data = isJson ? await response.json() : null;
 
     if (!response.ok) {
@@ -50,15 +55,20 @@ const request = async (url, options = {}) => {
 
 // Auth endpoints
 const login = (credentials) =>
-  request(`${authEndpoint}/login`, { method: 'POST', body: JSON.stringify(credentials) });
+  request(`${authEndpoint}/login`, {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  });
 
 const register = (credentials) =>
-  request(`${authEndpoint}/register`, { method: 'POST', body: JSON.stringify(credentials) });
+  request(`${authEndpoint}/register`, {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  });
 
 const getMe = () => request(`${authEndpoint}/me`);
 
-const deleteAccount = () =>
-  request(`${authEndpoint}/me`, { method: 'DELETE' });
+const deleteAccount = () => request(`${authEndpoint}/me`, { method: 'DELETE' });
 
 // Person endpoints
 const getAllPersons = () => request(personsEndpoint);
@@ -67,7 +77,10 @@ const createPerson = (newPerson) =>
   request(personsEndpoint, { method: 'POST', body: JSON.stringify(newPerson) });
 
 const updatePerson = (id, updatedDetails) =>
-  request(`${personsEndpoint}/${id}`, { method: 'PUT', body: JSON.stringify(updatedDetails) });
+  request(`${personsEndpoint}/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(updatedDetails),
+  });
 
 const removePerson = (id) =>
   request(`${personsEndpoint}/${id}`, { method: 'DELETE' });

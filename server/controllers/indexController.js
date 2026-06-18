@@ -9,7 +9,9 @@ indexRouter.get('/info', async (request, response, next) => {
   try {
     const count = await Person.countDocuments({});
     const today = new Date();
-    response.send(`<p> Phonebook has info for ${count} people <br> ${today} </p>`);
+    response.send(
+      `<p> Phonebook has info for ${count} people <br> ${today} </p>`,
+    );
   } catch (error) {
     next(error);
   }

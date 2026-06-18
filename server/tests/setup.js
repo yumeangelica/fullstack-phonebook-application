@@ -4,7 +4,9 @@ const connectDB = async () => {
   const mongoUri = process.env.TEST_MONGODB_URI || process.env.MONGODB_URI;
 
   if (!mongoUri) {
-    throw new Error('TEST_MONGODB_URI or MONGODB_URI environment variable is required for tests');
+    throw new Error(
+      'TEST_MONGODB_URI or MONGODB_URI environment variable is required for tests',
+    );
   }
 
   if (mongoose.connection.readyState === 0) {
@@ -12,7 +14,7 @@ const connectDB = async () => {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
-      family: 4
+      family: 4,
     });
   }
 };

@@ -8,8 +8,12 @@ const helper = require('./test-helper');
 describe('Person model', () => {
   let userId;
 
-  before(async () => { await connectDB(); });
-  after(async () => { await disconnectDB(); });
+  before(async () => {
+    await connectDB();
+  });
+  after(async () => {
+    await disconnectDB();
+  });
 
   beforeEach(async () => {
     await Person.deleteMany({});
@@ -94,7 +98,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-      await assert.rejects(() => person.save(), /First name must be at least 3 characters/);
+      await assert.rejects(
+        () => person.save(),
+        /First name must be at least 3 characters/,
+      );
     });
 
     it('validates minimum lastName length', async () => {
@@ -106,7 +113,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-      await assert.rejects(() => person.save(), /Last name must be at least 3 characters/);
+      await assert.rejects(
+        () => person.save(),
+        /Last name must be at least 3 characters/,
+      );
     });
 
     it('validates minimum number length', async () => {
@@ -130,7 +140,10 @@ describe('Person model', () => {
       };
 
       const person = new Person(personData);
-      await assert.rejects(() => person.save(), /First name cannot exceed 50 characters/);
+      await assert.rejects(
+        () => person.save(),
+        /First name cannot exceed 50 characters/,
+      );
     });
 
     it('validates phone number format', async () => {
@@ -151,11 +164,17 @@ describe('Person model', () => {
         '+358 50 1234567',
         '+1 2125551234',
         '+44 20 1234 5678',
-        '+49 30 12345678'
+        '+49 30 12345678',
       ];
 
       const lastNames = [
-        'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller'
+        'Smith',
+        'Johnson',
+        'Williams',
+        'Brown',
+        'Jones',
+        'Garcia',
+        'Miller',
       ];
 
       for (let i = 0; i < validNumbers.length; i++) {
@@ -286,12 +305,14 @@ describe('Person model', () => {
       const savedPerson = await person.save();
       const originalUpdatedAt = savedPerson.updatedAt;
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       savedPerson.firstName = 'Francisco';
       const updatedPerson = await savedPerson.save();
 
-      assert.ok(updatedPerson.updatedAt.getTime() > originalUpdatedAt.getTime());
+      assert.ok(
+        updatedPerson.updatedAt.getTime() > originalUpdatedAt.getTime(),
+      );
     });
   });
 });

@@ -12,8 +12,10 @@ const MIN_PASSWORD_LENGTH = 8;
 authRouter.post('/register', async (request, response, next) => {
   const { username, password } = request.body;
 
-  if (!username || !password) {
-    return response.status(400).json({ error: 'Username and password are required' });
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    return response
+      .status(400)
+      .json({ error: 'Username and password are required' });
   }
 
   if (password.length < MIN_PASSWORD_LENGTH) {
@@ -43,21 +45,27 @@ authRouter.post('/register', async (request, response, next) => {
 authRouter.post('/login', async (request, response, next) => {
   const { username, password } = request.body;
 
-  if (!username || !password) {
-    return response.status(400).json({ error: 'Username and password are required' });
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    return response
+      .status(400)
+      .json({ error: 'Username and password are required' });
   }
 
   try {
     const user = await User.findOne({ username: username.toLowerCase() });
 
     if (!user) {
-      return response.status(401).json({ error: 'Invalid username or password' });
+      return response
+        .status(401)
+        .json({ error: 'Invalid username or password' });
     }
 
     const passwordCorrect = await bcrypt.compare(password, user.passwordHash);
 
     if (!passwordCorrect) {
-      return response.status(401).json({ error: 'Invalid username or password' });
+      return response
+        .status(401)
+        .json({ error: 'Invalid username or password' });
     }
 
     const token = await generateToken(user.id, user.username);

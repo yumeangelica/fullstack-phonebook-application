@@ -1,5 +1,10 @@
 # Fullstack Phonebook Application
 
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Bun](https://img.shields.io/badge/Bun-1.x-black.svg)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF.svg)
+![Biome](https://img.shields.io/badge/Biome-2-60A5FA.svg)
+
 A modern phonebook application with user authentication, real-time validation, international phone number support, and comprehensive testing. Built with React, Node.js, Express, and MongoDB.
 
 Originally created for the Full Stack Open course in 2023, significantly modernized and enhanced in 2026 with improved architecture, authentication, validation, testing, and production-ready features.
@@ -19,18 +24,18 @@ Originally created for the Full Stack Open course in 2023, significantly moderni
 
 ## Tech Stack
 
-**Frontend:** React 19, Webpack 5, libphonenumber-js
-**Backend:** Node.js 22, Express 5, MongoDB, Mongoose 9
+**Frontend:** React 19, Vite 8, libphonenumber-js
+**Backend:** Express 5, MongoDB, Mongoose 9
+**Runtime & tooling:** Bun (package manager, runtime, test runner)
 **Auth:** jose (JWT HS256), bcrypt
-**Testing:** Node.js built-in test runner (`node:test`), supertest
-**Development:** Concurrently, ESLint 9 (flat config)
+**Testing:** `node:test` (run via `bun test`), supertest
+**Linting & formatting:** Biome 2
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js >= 20.0.0
-- npm
+- [Bun](https://bun.sh) >= 1.3
 - MongoDB (local or MongoDB Atlas)
 
 ### Installation
@@ -38,12 +43,16 @@ Originally created for the Full Stack Open course in 2023, significantly moderni
 ```bash
 git clone <repository-url>
 cd fullstack-phonebook-application
-npm install
+bun install
 ```
 
 ### Environment Setup
 
-Create `.env` file:
+Copy `.env.example` to `.env` and fill in the values:
+
+```bash
+cp .env.example .env
+```
 
 ```
 MONGODB_URI=your-mongodb-uri
@@ -52,10 +61,12 @@ JWT_SECRET=your-secret-key
 PORT=5001
 ```
 
+`JWT_SECRET` is required in production; the server refuses to start without a secure value.
+
 ### Development
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 Frontend: http://localhost:3000
@@ -64,20 +75,22 @@ Backend: http://localhost:5001
 ### Production
 
 ```bash
-npm run build
-npm start
+bun run build
+bun start
 ```
 
 ## Scripts
 
-- `npm run dev` - Start development servers (backend + frontend)
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm test` - Run all tests
-- `npm run test:frontend` - Run React component tests
-- `npm run test:backend` - Run API and model tests
-- `npm run test:watch` - Run backend tests in watch mode
-- `npm run lint` - Run ESLint
+- `bun run dev` - Start development servers (backend + frontend)
+- `bun run build` - Build the frontend for production (Vite)
+- `bun start` - Start production server
+- `bun test` - Run all tests
+- `bun run test:frontend` - Run React component tests
+- `bun run test:backend` - Run API and model tests
+- `bun run test:watch` - Run backend tests in watch mode
+- `bun run lint` - Lint with Biome
+- `bun run format` - Format with Biome
+- `bun run check` - Lint, format, and apply safe fixes with Biome
 
 ## API Endpoints
 
@@ -137,7 +150,8 @@ GET    /live               - Liveness probe
 │   ├── models/          # Mongoose models (User, Person)
 │   ├── tests/           # Backend tests (supertest)
 │   └── utils/           # Config, database, and auth utilities
-├── eslint.config.js     # ESLint flat config
+├── biome.json           # Biome lint + format config
+├── vite.config.js       # Vite build & dev server config
 ├── index.html           # HTML template
 └── index.js             # Server entry point
 ```

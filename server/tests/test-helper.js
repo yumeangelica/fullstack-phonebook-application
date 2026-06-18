@@ -7,18 +7,18 @@ const initialPersons = [
   {
     firstName: 'John',
     lastName: 'Doe',
-    number: '+358 40 1234567'
+    number: '+358 40 1234567',
   },
   {
     firstName: 'Jane',
     lastName: 'Smith',
-    number: '+358 50 9876543'
+    number: '+358 50 9876543',
   },
   {
     firstName: 'Bob',
     lastName: 'Johnson',
-    number: '+358 44 5555555'
-  }
+    number: '+358 44 5555555',
+  },
 ];
 
 const testUser = {
@@ -50,12 +50,12 @@ const nonExistingId = async (userId) => {
 
 const personsInDb = async () => {
   const persons = await Person.find({});
-  return persons.map(person => person.toJSON());
+  return persons.map((person) => person.toJSON());
 };
 
 const usersInDb = async () => {
   const users = await User.find({});
-  return users.map(user => user.toJSON());
+  return users.map((user) => user.toJSON());
 };
 
 module.exports = {
