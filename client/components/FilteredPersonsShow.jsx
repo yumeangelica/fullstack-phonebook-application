@@ -18,13 +18,14 @@ const FilteredPersonsShow = ({ filteredPersons, removePerson, loading }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredPersons.map(person => (
+            {filteredPersons.map((person) => (
               <tr key={person.id}>
                 <td data-label="First name">{person.firstName}</td>
                 <td data-label="Last name">{person.lastName}</td>
                 <td data-label="Number">{person.number}</td>
                 <td data-label="Action">
                   <button
+                    type="button"
                     className="actionbtn"
                     onClick={() => removePerson(person.id)}
                     aria-label={`Delete ${person.firstName} ${person.lastName}`}

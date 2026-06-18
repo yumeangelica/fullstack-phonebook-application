@@ -13,8 +13,12 @@ describe('Persons API', () => {
   let token;
   let userId;
 
-  before(async () => { await connectDB(); });
-  after(async () => { await disconnectDB(); });
+  before(async () => {
+    await connectDB();
+  });
+  after(async () => {
+    await disconnectDB();
+  });
 
   beforeEach(async () => {
     await Person.deleteMany({});
@@ -27,9 +31,9 @@ describe('Persons API', () => {
 
     // Seed persons with user reference
     const personObjects = helper.initialPersons.map(
-      person => new Person({ ...person, user: userId })
+      (person) => new Person({ ...person, user: userId }),
     );
-    await Promise.all(personObjects.map(person => person.save()));
+    await Promise.all(personObjects.map((person) => person.save()));
   });
 
   describe('GET /api/persons', () => {
@@ -42,16 +46,17 @@ describe('Persons API', () => {
     });
 
     it('returns 401 without token', async () => {
-      await api
-        .get('/api/persons')
-        .expect(401);
+      await api.get('/api/persons').expect(401);
     });
 
     it('returns correct number of persons', async () => {
       const response = await api
         .get('/api/persons')
         .set('Authorization', `Bearer ${token}`);
-      assert.strictEqual(response.body.persons.length, helper.initialPersons.length);
+      assert.strictEqual(
+        response.body.persons.length,
+        helper.initialPersons.length,
+      );
     });
 
     it('returns persons with pagination info', async () => {
@@ -74,7 +79,7 @@ describe('Persons API', () => {
         .expect(200);
 
       assert.strictEqual(response.body.persons.length, 2);
-      const names = response.body.persons.map(p => p.firstName);
+      const names = response.body.persons.map((p) => p.firstName);
       assert.ok(names.includes('John'));
     });
 
@@ -101,16 +106,27 @@ describe('Persons API', () => {
 
     it('does not return other users persons', async () => {
       // Create another user with a person
-      const otherAuth = await helper.createTestUser({ username: 'otheruser', password: 'otherpassword123' });
-      await new Person({ firstName: 'Other', lastName: 'Person', number: '+358 40 9999999', user: otherAuth.user.id }).save();
+      const otherAuth = await helper.createTestUser({
+        username: 'otheruser',
+        password: 'otherpassword123',
+      });
+      await new Person({
+        firstName: 'Other',
+        lastName: 'Person',
+        number: '+358 40 9999999',
+        user: otherAuth.user.id,
+      }).save();
 
       const response = await api
         .get('/api/persons')
         .set('Authorization', `Bearer ${token}`);
 
       // Should only see original user's persons, not the other user's
-      assert.strictEqual(response.body.persons.length, helper.initialPersons.length);
-      const names = response.body.persons.map(p => p.firstName);
+      assert.strictEqual(
+        response.body.persons.length,
+        helper.initialPersons.length,
+      );
+      const names = response.body.persons.map((p) => p.firstName);
       assert.ok(!names.includes('Other'));
     });
   });
@@ -130,7 +146,7 @@ describe('Persons API', () => {
         ...personToView,
         user: personToView.user.toString(),
         createdAt: personToView.createdAt.toISOString(),
-        updatedAt: personToView.updatedAt.toISOString()
+        updatedAt: personToView.updatedAt.toISOString(),
       };
 
       assert.deepStrictEqual(resultPerson.body, expectedPerson);
@@ -160,7 +176,7 @@ describe('Persons API', () => {
       const newPerson = {
         firstName: 'Alice',
         lastName: 'Cooper',
-        number: '+358 44 1111111'
+        number: '+358 44 1111111',
       };
 
       await api
@@ -173,13 +189,13 @@ describe('Persons API', () => {
       const personsAtEnd = await helper.personsInDb();
       assert.strictEqual(personsAtEnd.length, helper.initialPersons.length + 1);
 
-      const names = personsAtEnd.map(p => `${p.firstName} ${p.lastName}`);
+      const names = personsAtEnd.map((p) => `${p.firstName} ${p.lastName}`);
       assert.ok(names.includes('Alice Cooper'));
     });
 
     it('returns 400 if name is missing', async () => {
       const newPerson = {
-        number: '+358 44 1111111'
+        number: '+358 44 1111111',
       };
 
       const result = await api
@@ -194,7 +210,7 @@ describe('Persons API', () => {
     it('returns 400 if number is missing', async () => {
       const newPerson = {
         firstName: 'Alice',
-        lastName: 'Cooper'
+        lastName: 'Cooper',
       };
 
       const result = await api
@@ -210,7 +226,7 @@ describe('Persons API', () => {
       const newPerson = {
         firstName: 'Alice',
         lastName: 'Cooper',
-        number: '+358 12'
+        number: '+358 12',
       };
 
       const result = await api
@@ -226,7 +242,7 @@ describe('Persons API', () => {
       const existingPerson = {
         firstName: 'John',
         lastName: 'Doe',
-        number: '+358 44 9999999'
+        number: '+358 44 9999999',
       };
 
       const result = await api
@@ -242,7 +258,7 @@ describe('Persons API', () => {
       const existingNumber = {
         firstName: 'Different',
         lastName: 'Person',
-        number: '+358 40 1234567'
+        number: '+358 40 1234567',
       };
 
       const result = await api
@@ -263,7 +279,7 @@ describe('Persons API', () => {
       const updatedData = {
         firstName: 'Updated',
         lastName: 'Name',
-        number: '+358 44 9999999'
+        number: '+358 44 9999999',
       };
 
       const result = await api
@@ -284,7 +300,7 @@ describe('Persons API', () => {
       const updatedData = {
         firstName: 'Updated',
         lastName: 'Name',
-        number: '+358 44 9999999'
+        number: '+358 44 9999999',
       };
 
       await api
@@ -308,8 +324,12 @@ describe('Persons API', () => {
       const personsAtEnd = await helper.personsInDb();
       assert.strictEqual(personsAtEnd.length, helper.initialPersons.length - 1);
 
-      const names = personsAtEnd.map(p => `${p.firstName} ${p.lastName}`);
-      assert.ok(!names.includes(`${personToDelete.firstName} ${personToDelete.lastName}`));
+      const names = personsAtEnd.map((p) => `${p.firstName} ${p.lastName}`);
+      assert.ok(
+        !names.includes(
+          `${personToDelete.firstName} ${personToDelete.lastName}`,
+        ),
+      );
     });
 
     it('returns 404 if person does not exist', async () => {
@@ -333,7 +353,10 @@ describe('Persons API', () => {
       assert.ok('totalPersons' in result.body);
       assert.ok('recentPersons' in result.body);
       assert.ok('timestamp' in result.body);
-      assert.strictEqual(result.body.totalPersons, helper.initialPersons.length);
+      assert.strictEqual(
+        result.body.totalPersons,
+        helper.initialPersons.length,
+      );
     });
   });
 });

@@ -29,7 +29,9 @@ const Filter = ({ newFilter, onFilterChange }) => {
             )}
           </div>
           <small id="filter-help" className="filter-help-text">
-            {newFilter ? `Showing results for "${newFilter}"` : 'Type to search through your contacts'}
+            {newFilter
+              ? `Showing results for "${newFilter}"`
+              : 'Type to search through your contacts'}
           </small>
         </div>
       </div>

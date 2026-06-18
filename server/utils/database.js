@@ -6,7 +6,9 @@ let listenersRegistered = false;
 // Enhanced MongoDB connection with retry logic and production-ready configuration
 const connectToMongoDB = async (uri, options = {}) => {
   if (!uri) {
-    throw new Error('MongoDB URI is required. Set MONGODB_URI environment variable.');
+    throw new Error(
+      'MongoDB URI is required. Set MONGODB_URI environment variable.',
+    );
   }
 
   const defaultOptions = {
@@ -14,7 +16,7 @@ const connectToMongoDB = async (uri, options = {}) => {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
     family: 4,
-    ...options
+    ...options,
   };
 
   const maxRetries = 5;
@@ -22,7 +24,9 @@ const connectToMongoDB = async (uri, options = {}) => {
 
   while (retries < maxRetries) {
     try {
-      console.log(`Attempting to connect to MongoDB... (attempt ${retries + 1}/${maxRetries})`);
+      console.log(
+        `Attempting to connect to MongoDB... (attempt ${retries + 1}/${maxRetries})`,
+      );
 
       await mongoose.connect(uri, defaultOptions);
 
@@ -48,16 +52,21 @@ const connectToMongoDB = async (uri, options = {}) => {
       return mongoose.connection;
     } catch (error) {
       retries++;
-      console.error(`❌ MongoDB connection failed (attempt ${retries}/${maxRetries}):`, error.message);
+      console.error(
+        `❌ MongoDB connection failed (attempt ${retries}/${maxRetries}):`,
+        error.message,
+      );
 
       if (retries === maxRetries) {
-        throw new Error(`Failed to connect to MongoDB after ${maxRetries} attempts: ${error.message}`);
+        throw new Error(
+          `Failed to connect to MongoDB after ${maxRetries} attempts: ${error.message}`,
+        );
       }
 
       // Exponential backoff
-      const delay = Math.min(1000 * Math.pow(2, retries), 30000);
+      const delay = Math.min(1000 * 2 ** retries, 30000);
       console.log(`⏳ Retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 };
@@ -74,5 +83,5 @@ const disconnectFromMongoDB = async () => {
 
 module.exports = {
   connectToMongoDB,
-  disconnectFromMongoDB
+  disconnectFromMongoDB,
 };

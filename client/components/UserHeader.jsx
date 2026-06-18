@@ -1,7 +1,7 @@
 const UserHeader = ({ username, onLogout, onDeleteAccount }) => {
   const handleDeleteAccount = () => {
     const confirmed = window.confirm(
-      'Are you sure you want to delete your account? This will permanently remove all your contacts.'
+      'Are you sure you want to delete your account? This will permanently remove all your contacts.',
     );
     if (confirmed) {
       onDeleteAccount();
@@ -15,6 +15,7 @@ const UserHeader = ({ username, onLogout, onDeleteAccount }) => {
       </span>
       <div className="user-header-actions">
         <button
+          type="button"
           className="user-header-btn logout-btn"
           onClick={onLogout}
           aria-label="Sign out"
@@ -22,6 +23,7 @@ const UserHeader = ({ username, onLogout, onDeleteAccount }) => {
           Sign out
         </button>
         <button
+          type="button"
           className="user-header-btn delete-btn"
           onClick={handleDeleteAccount}
           aria-label="Delete account"

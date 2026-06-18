@@ -1,7 +1,7 @@
 const healthRouter = require('express').Router();
 const mongoose = require('mongoose');
 const Person = require('../models/personModel');
-const os = require('os');
+const os = require('node:os');
 
 // Health check endpoint
 healthRouter.get('/health', async (req, res) => {
@@ -12,7 +12,7 @@ healthRouter.get('/health', async (req, res) => {
       0: 'disconnected',
       1: 'connected',
       2: 'connecting',
-      3: 'disconnecting'
+      3: 'disconnecting',
     };
 
     // Check if the database is operational
@@ -33,19 +33,19 @@ healthRouter.get('/health', async (req, res) => {
       environment: process.env.NODE_ENV || 'development',
       database: {
         status: dbStatuses[dbStatus],
-        operational: dbOperational
+        operational: dbOperational,
       },
       memory: {
         used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
         total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-        system: Math.round(os.totalmem() / 1024 / 1024 / 1024)
+        system: Math.round(os.totalmem() / 1024 / 1024 / 1024),
       },
       system: {
         platform: os.platform(),
         arch: os.arch(),
         loadavg: os.loadavg(),
-        cpus: os.cpus().length
-      }
+        cpus: os.cpus().length,
+      },
     };
 
     const statusCode = health.status === 'healthy' ? 200 : 503;
@@ -55,7 +55,7 @@ healthRouter.get('/health', async (req, res) => {
     res.status(503).json({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
-      error: 'Health check failed'
+      error: 'Health check failed',
     });
   }
 });
@@ -67,14 +67,14 @@ healthRouter.get('/ready', async (req, res) => {
     await Person.findOne().limit(1);
     res.status(200).json({
       status: 'ready',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error('Readiness check failed:', error);
     res.status(503).json({
       status: 'not ready',
       timestamp: new Date().toISOString(),
-      error: 'Database not accessible'
+      error: 'Database not accessible',
     });
   }
 });
@@ -84,7 +84,7 @@ healthRouter.get('/live', (req, res) => {
   res.status(200).json({
     status: 'alive',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
   });
 });
 

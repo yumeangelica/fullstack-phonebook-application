@@ -3,7 +3,7 @@ const { verifyToken } = require('../utils/auth');
 const requireAuth = async (request, response, next) => {
   const authorization = request.get('authorization');
 
-  if (!authorization || !authorization.toLowerCase().startsWith('bearer ')) {
+  if (!authorization?.toLowerCase().startsWith('bearer ')) {
     return response.status(401).json({ error: 'Token missing' });
   }
 

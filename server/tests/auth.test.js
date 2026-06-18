@@ -10,8 +10,12 @@ const helper = require('./test-helper');
 const api = supertest(app);
 
 describe('Auth API', () => {
-  before(async () => { await connectDB(); });
-  after(async () => { await disconnectDB(); });
+  before(async () => {
+    await connectDB();
+  });
+  after(async () => {
+    await disconnectDB();
+  });
 
   beforeEach(async () => {
     await Person.deleteMany({});
@@ -76,7 +80,10 @@ describe('Auth API', () => {
 
       const result = await api
         .post('/api/auth/register')
-        .send({ username: helper.testUser.username, password: 'anotherpassword123' })
+        .send({
+          username: helper.testUser.username,
+          password: 'anotherpassword123',
+        })
         .expect(409);
 
       assert.ok(result.body.error.includes('Username already taken'));
@@ -89,7 +96,10 @@ describe('Auth API', () => {
 
       const result = await api
         .post('/api/auth/login')
-        .send({ username: helper.testUser.username, password: helper.testUser.password })
+        .send({
+          username: helper.testUser.username,
+          password: helper.testUser.password,
+        })
         .expect(200)
         .expect('Content-Type', /application\/json/);
 
@@ -118,10 +128,7 @@ describe('Auth API', () => {
     });
 
     it('returns 400 if fields are missing', async () => {
-      await api
-        .post('/api/auth/login')
-        .send({})
-        .expect(400);
+      await api.post('/api/auth/login').send({}).expect(400);
     });
   });
 
@@ -142,9 +149,7 @@ describe('Auth API', () => {
     });
 
     it('returns 401 without token', async () => {
-      await api
-        .get('/api/auth/me')
-        .expect(401);
+      await api.get('/api/auth/me').expect(401);
     });
 
     it('returns 401 with invalid token', async () => {
@@ -160,8 +165,18 @@ describe('Auth API', () => {
       const { user, token } = await helper.createTestUser();
 
       // Add some persons for this user
-      await new Person({ firstName: 'Test', lastName: 'Person', number: '+358 40 1111111', user: user.id }).save();
-      await new Person({ firstName: 'Another', lastName: 'Person', number: '+358 40 2222222', user: user.id }).save();
+      await new Person({
+        firstName: 'Test',
+        lastName: 'Person',
+        number: '+358 40 1111111',
+        user: user.id,
+      }).save();
+      await new Person({
+        firstName: 'Another',
+        lastName: 'Person',
+        number: '+358 40 2222222',
+        user: user.id,
+      }).save();
 
       await api
         .delete('/api/auth/me')
@@ -176,9 +191,7 @@ describe('Auth API', () => {
     });
 
     it('returns 401 without token', async () => {
-      await api
-        .delete('/api/auth/me')
-        .expect(401);
+      await api.delete('/api/auth/me').expect(401);
     });
   });
 });

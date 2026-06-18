@@ -2,7 +2,7 @@ const { JSDOM } = require('jsdom');
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', {
   url: 'http://localhost',
-  pretendToBeVisual: true
+  pretendToBeVisual: true,
 });
 
 global.window = dom.window;
@@ -13,7 +13,7 @@ global.HTMLElement = dom.window.HTMLElement;
 Object.defineProperty(global, 'navigator', {
   value: dom.window.navigator,
   configurable: true,
-  writable: true
+  writable: true,
 });
 
 global.requestAnimationFrame = (fn) => setTimeout(fn, 0);

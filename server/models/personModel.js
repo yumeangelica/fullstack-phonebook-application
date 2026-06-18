@@ -10,90 +10,96 @@ const idTransform = (doc, ret) => {
   return ret;
 };
 
-const personSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    minlength: [3, 'First name must be at least 3 characters long'],
-    maxlength: [50, 'First name cannot exceed 50 characters'],
-    required: [true, 'First name is required'],
-    trim: true,
-    validate: {
-      validator(v) {
-        // Unicode regex supports international names (accents, non-Latin scripts)
-        const nameRegex = /^[\p{L}\s'-]+$/u;
+const personSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      minlength: [3, 'First name must be at least 3 characters long'],
+      maxlength: [50, 'First name cannot exceed 50 characters'],
+      required: [true, 'First name is required'],
+      trim: true,
+      validate: {
+        validator(v) {
+          // Unicode regex supports international names (accents, non-Latin scripts)
+          const nameRegex = /^[\p{L}\s'-]+$/u;
 
-        // Data quality checks for consistent name formatting
-        if (!nameRegex.test(v) || /\s{2,}/.test(v)) return false;
+          // Data quality checks for consistent name formatting
+          if (!nameRegex.test(v) || /\s{2,}/.test(v)) return false;
 
-        // Prevent consecutive special characters that could cause display issues
-        if (/[-']{2,}/.test(v)) return false;
+          // Prevent consecutive special characters that could cause display issues
+          if (/[-']{2,}/.test(v)) return false;
 
-        // Prevent adjacent different special characters (linguistically invalid)
-        if (/-'|'-/.test(v)) return false;
+          // Prevent adjacent different special characters (linguistically invalid)
+          if (/-'|'-/.test(v)) return false;
 
-        // Names should not start or end with special characters
-        if (/^[-']|[-']$/.test(v)) return false;
+          // Names should not start or end with special characters
+          if (/^[-']|[-']$/.test(v)) return false;
 
-        return true;
+          return true;
+        },
+        message:
+          'First name can only contain letters, spaces, hyphens, and apostrophes. Invalid character combinations not allowed.',
       },
-      message: 'First name can only contain letters, spaces, hyphens, and apostrophes. Invalid character combinations not allowed.',
+    },
+    lastName: {
+      type: String,
+      minlength: [3, 'Last name must be at least 3 characters long'],
+      maxlength: [50, 'Last name cannot exceed 50 characters'],
+      required: [true, 'Last name is required'],
+      trim: true,
+      validate: {
+        validator(v) {
+          // Unicode regex for proper international name support
+          const nameRegex = /^[\p{L}\s'-]+$/u;
+
+          // Basic checks
+          if (!nameRegex.test(v) || /\s{2,}/.test(v)) return false;
+
+          // No consecutive hyphens or apostrophes
+          if (/[-']{2,}/.test(v)) return false;
+
+          // No hyphen and apostrophe adjacent
+          if (/-'|'-/.test(v)) return false;
+
+          // Cannot start or end with hyphen or apostrophe
+          if (/^[-']|[-']$/.test(v)) return false;
+
+          return true;
+        },
+        message:
+          'Last name can only contain letters, spaces, hyphens, and apostrophes. Invalid character combinations not allowed.',
+      },
+    },
+    number: {
+      type: String,
+      validate: {
+        validator(v) {
+          // Use libphonenumber-js for real-world international phone number validation
+          // This library handles country-specific rules and formatting requirements
+          try {
+            return isValidPhoneNumber(v);
+          } catch (_error) {
+            return false;
+          }
+        },
+        message: (props) =>
+          `${props.value} is not a valid phone number! Please use international format (e.g., +358 40 123 4567)`,
+      },
+      required: [true, 'Phone number is required'],
+      trim: true,
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
   },
-  lastName: {
-    type: String,
-    minlength: [3, 'Last name must be at least 3 characters long'],
-    maxlength: [50, 'Last name cannot exceed 50 characters'],
-    required: [true, 'Last name is required'],
-    trim: true,
-    validate: {
-      validator(v) {
-        // Unicode regex for proper international name support
-        const nameRegex = /^[\p{L}\s'-]+$/u;
-
-        // Basic checks
-        if (!nameRegex.test(v) || /\s{2,}/.test(v)) return false;
-
-        // No consecutive hyphens or apostrophes
-        if (/[-']{2,}/.test(v)) return false;
-
-        // No hyphen and apostrophe adjacent
-        if (/-'|'-/.test(v)) return false;
-
-        // Cannot start or end with hyphen or apostrophe
-        if (/^[-']|[-']$/.test(v)) return false;
-
-        return true;
-      },
-      message: 'Last name can only contain letters, spaces, hyphens, and apostrophes. Invalid character combinations not allowed.',
-    },
+  {
+    timestamps: true,
+    toJSON: { transform: idTransform },
+    toObject: { transform: idTransform },
   },
-  number: {
-    type: String,
-    validate: {
-      validator(v) {
-        // Use libphonenumber-js for real-world international phone number validation
-        // This library handles country-specific rules and formatting requirements
-        try {
-          return isValidPhoneNumber(v);
-        } catch (_error) {
-          return false;
-        }
-      },
-      message: props => `${props.value} is not a valid phone number! Please use international format (e.g., +358 40 123 4567)`,
-    },
-    required: [true, 'Phone number is required'],
-    trim: true,
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-}, {
-  timestamps: true,
-  toJSON: { transform: idTransform },
-  toObject: { transform: idTransform },
-});
+);
 
 // Database indexing — unique per user (different users can have same contacts)
 personSchema.index({ firstName: 1, lastName: 1, user: 1 }, { unique: true });

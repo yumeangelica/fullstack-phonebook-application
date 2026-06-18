@@ -4,17 +4,17 @@ const errorHandler = (error, request, response, _next) => {
 
   // MongoDB validation errors - extract and format user-friendly messages
   if (error.name === 'ValidationError') {
-    const messages = Object.values(error.errors).map(err => err.message);
+    const messages = Object.values(error.errors).map((err) => err.message);
     return response.status(400).json({
       error: 'Validation failed',
-      details: messages
+      details: messages,
     });
   }
 
   // MongoDB cast errors (invalid ObjectId)
   if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(400).json({
-      error: 'Invalid ID format'
+      error: 'Invalid ID format',
     });
   }
 
@@ -25,32 +25,32 @@ const errorHandler = (error, request, response, _next) => {
 
     if (field === 'username') {
       return response.status(409).json({
-        error: 'Username already taken'
+        error: 'Username already taken',
       });
     }
 
     if (field === 'number') {
       return response.status(409).json({
-        error: 'Phone number already exists'
+        error: 'Phone number already exists',
       });
     }
 
     return response.status(409).json({
-      error: `${field} '${value}' already exists`
+      error: `${field} '${value}' already exists`,
     });
   }
 
   // Rate limiting errors
   if (error.status === 429) {
     return response.status(429).json({
-      error: 'Too many requests, please try again later'
+      error: 'Too many requests, please try again later',
     });
   }
 
   // Default server error
   response.status(500).json({
     error: 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { details: error.message })
+    ...(process.env.NODE_ENV === 'development' && { details: error.message }),
   });
 };
 
@@ -86,7 +86,7 @@ const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
     const now = Date.now();
     const windowStart = now - windowMs;
     for (const [key, timestamps] of requests.entries()) {
-      const filtered = timestamps.filter(time => time > windowStart);
+      const filtered = timestamps.filter((time) => time > windowStart);
       if (filtered.length === 0) {
         requests.delete(key);
       } else {
@@ -103,12 +103,14 @@ const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
     const now = Date.now();
     const windowStart = now - windowMs;
 
-    const ipRequests = (requests.get(ip) || []).filter(time => time > windowStart);
+    const ipRequests = (requests.get(ip) || []).filter(
+      (time) => time > windowStart,
+    );
 
     if (ipRequests.length >= max) {
       return res.status(429).json({
         error: 'Too many requests',
-        retryAfter: Math.ceil(windowMs / 1000)
+        retryAfter: Math.ceil(windowMs / 1000),
       });
     }
 
@@ -122,7 +124,7 @@ const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
 const unknownEndpoint = (request, response) => {
   response.status(404).json({
     error: 'Unknown endpoint',
-    message: `Cannot ${request.method} ${request.path}`
+    message: `Cannot ${request.method} ${request.path}`,
   });
 };
 
@@ -131,7 +133,10 @@ const securityHeaders = (_req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader(
+    'Strict-Transport-Security',
+    'max-age=31536000; includeSubDomains',
+  );
   next();
 };
 
@@ -140,5 +145,5 @@ module.exports = {
   errorHandler,
   httpLogger,
   createRateLimiter,
-  securityHeaders
+  securityHeaders,
 };

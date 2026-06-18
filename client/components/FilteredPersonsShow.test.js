@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test';
 import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import FilteredPersonsShow from './FilteredPersonsShow';
@@ -11,14 +11,14 @@ describe('<FilteredPersonsShow />', () => {
         firstName: 'miuku',
         lastName: 'miau',
         number: '050-4565789',
-        id: '1'
+        id: '1',
       },
       {
         firstName: 'mauku',
         lastName: 'miauu',
         number: '050-9654321',
-        id: '2'
-      }
+        id: '2',
+      },
     ];
 
     const container = document.createElement('div');
@@ -28,7 +28,11 @@ describe('<FilteredPersonsShow />', () => {
     await act(async () => {
       root = createRoot(container);
       root.render(
-        <FilteredPersonsShow filteredPersons={persons} removePerson={() => { }} loading={false} />
+        <FilteredPersonsShow
+          filteredPersons={persons}
+          removePerson={() => {}}
+          loading={false}
+        />,
       );
     });
 
@@ -57,7 +61,11 @@ describe('<FilteredPersonsShow />', () => {
     await act(async () => {
       root = createRoot(container);
       root.render(
-        <FilteredPersonsShow filteredPersons={[]} removePerson={() => { }} loading={false} />
+        <FilteredPersonsShow
+          filteredPersons={[]}
+          removePerson={() => {}}
+          loading={false}
+        />,
       );
     });
 
@@ -75,7 +83,11 @@ describe('<FilteredPersonsShow />', () => {
     await act(async () => {
       root = createRoot(container);
       root.render(
-        <FilteredPersonsShow filteredPersons={[]} removePerson={() => { }} loading={true} />
+        <FilteredPersonsShow
+          filteredPersons={[]}
+          removePerson={() => {}}
+          loading={true}
+        />,
       );
     });
 
