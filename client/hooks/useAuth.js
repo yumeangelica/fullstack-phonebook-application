@@ -18,11 +18,18 @@ const useAuth = () => {
 
       try {
         const parsed = JSON.parse(stored);
+        if (!parsed?.token) {
+          throw new Error('Stored user is missing a token');
+        }
+
         apiService.setToken(parsed.token);
 
         // Validate token by calling /me
-        await apiService.getMe();
-        setUser(parsed);
+        const response = await apiService.getMe();
+        const userData = { ...response.data, token: parsed.token };
+
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+        setUser(userData);
       } catch (_error) {
         // Token expired or invalid
         window.localStorage.removeItem(STORAGE_KEY);

@@ -8,11 +8,29 @@ const { requireAuth } = require('../middleware/auth');
 const SALT_ROUNDS = 10;
 const MIN_PASSWORD_LENGTH = 8;
 
+const normalizeUsername = (username) => username.trim().toLowerCase();
+
+const createAuthResponse = async (user) => {
+  const id = user._id.toString();
+  const token = await generateToken(id, user.username);
+
+  return {
+    token,
+    username: user.username,
+    id,
+  };
+};
+
 // Register
 authRouter.post('/register', async (request, response, next) => {
   const { username, password } = request.body;
 
-  if (typeof username !== 'string' || typeof password !== 'string') {
+  if (
+    typeof username !== 'string' ||
+    typeof password !== 'string' ||
+    !username.trim() ||
+    !password
+  ) {
     return response
       .status(400)
       .json({ error: 'Username and password are required' });
@@ -26,16 +44,13 @@ authRouter.post('/register', async (request, response, next) => {
 
   try {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    const user = new User({ username, passwordHash });
+    const user = new User({
+      username: normalizeUsername(username),
+      passwordHash,
+    });
     const savedUser = await user.save();
 
-    const token = await generateToken(savedUser.id, savedUser.username);
-
-    response.status(201).json({
-      token,
-      username: savedUser.username,
-      id: savedUser.id,
-    });
+    response.status(201).json(await createAuthResponse(savedUser));
   } catch (error) {
     next(error);
   }
@@ -45,14 +60,19 @@ authRouter.post('/register', async (request, response, next) => {
 authRouter.post('/login', async (request, response, next) => {
   const { username, password } = request.body;
 
-  if (typeof username !== 'string' || typeof password !== 'string') {
+  if (
+    typeof username !== 'string' ||
+    typeof password !== 'string' ||
+    !username.trim() ||
+    !password
+  ) {
     return response
       .status(400)
       .json({ error: 'Username and password are required' });
   }
 
   try {
-    const user = await User.findOne({ username: username.toLowerCase() });
+    const user = await User.findOne({ username: normalizeUsername(username) });
 
     if (!user) {
       return response
@@ -68,13 +88,7 @@ authRouter.post('/login', async (request, response, next) => {
         .json({ error: 'Invalid username or password' });
     }
 
-    const token = await generateToken(user.id, user.username);
-
-    response.json({
-      token,
-      username: user.username,
-      id: user.id,
-    });
+    response.json(await createAuthResponse(user));
   } catch (error) {
     next(error);
   }
