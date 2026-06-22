@@ -4,7 +4,9 @@ const testMongoUri = process.env.TEST_MONGODB_URI?.trim();
 const developmentMongoUri = process.env.MONGODB_URI?.trim();
 
 if (!testMongoUri) {
-  throw new Error('TEST_MONGODB_URI environment variable is required for tests');
+  throw new Error(
+    'TEST_MONGODB_URI environment variable is required for tests',
+  );
 }
 
 if (developmentMongoUri && testMongoUri === developmentMongoUri) {
