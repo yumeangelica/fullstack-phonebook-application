@@ -28,7 +28,6 @@ jobs:
     env:
       NODE_ENV: test
       TEST_MONGODB_URI: "${{ secrets.TEST_MONGODB_URI || 'mongodb://testuser:testpass@localhost:27017/test_phonebook?authSource=admin' }}"
-      MONGODB_URI: "${{ secrets.TEST_MONGODB_URI || 'mongodb://testuser:testpass@localhost:27017/test_phonebook?authSource=admin' }}"
 
     steps:
       - name: Checkout code
@@ -45,7 +44,6 @@ jobs:
       - name: Verify environment setup
         run: |
           echo "NODE_ENV: $NODE_ENV"
-          echo "MONGODB_URI is set: $([ -n "$MONGODB_URI" ] && echo "yes" || echo "no")"
           echo "TEST_MONGODB_URI is set: $([ -n "$TEST_MONGODB_URI" ] && echo "yes" || echo "no")"
 
       - name: Lint and format check
