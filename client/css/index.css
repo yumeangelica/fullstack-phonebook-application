@@ -358,10 +358,6 @@ button:disabled:hover {
   color: var(--color-error);
 }
 
-.validation-message.success {
-  color: var(--color-success);
-}
-
 /* ───────────── Notifications ───────────── */
 .notification-alert {
   margin: 1rem 1.25rem 0;

@@ -10,7 +10,7 @@ const {
 const apiRouter = require('./controllers/apiController');
 const authRouter = require('./controllers/authController');
 const healthRouter = require('./controllers/healthController');
-const { inProduction, ALLOWED_ORIGINS } = require('./utils/config');
+const { inProduction, inTest, ALLOWED_ORIGINS } = require('./utils/config');
 const path = require('node:path');
 const app = express();
 
@@ -41,7 +41,10 @@ if (inProduction) {
   app.use(express.static(path.join(__dirname, '../build')));
 }
 
-app.use(httpLogger);
+// Skipped in tests to keep test output free of request log noise
+if (!inTest) {
+  app.use(httpLogger);
+}
 
 app.use('/api/auth', authRouter);
 app.use('/api', apiRouter);
