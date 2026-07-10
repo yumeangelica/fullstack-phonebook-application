@@ -8,6 +8,10 @@ const { requireAuth } = require('../middleware/auth');
 const SALT_ROUNDS = 10;
 const MIN_PASSWORD_LENGTH = 8;
 
+// Compared against when the user is not found, so login takes the same time
+// whether or not the username exists (prevents timing-based enumeration)
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync('timing-equalizer', SALT_ROUNDS);
+
 const normalizeUsername = (username) => username.trim().toLowerCase();
 
 const createAuthResponse = async (user) => {
@@ -75,6 +79,7 @@ authRouter.post('/login', async (request, response, next) => {
     const user = await User.findOne({ username: normalizeUsername(username) });
 
     if (!user) {
+      await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
       return response
         .status(401)
         .json({ error: 'Invalid username or password' });
