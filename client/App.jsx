@@ -9,6 +9,8 @@ import UserHeader from './components/UserHeader';
 import useAuth from './hooks/useAuth';
 import useNotification from './hooks/useNotification';
 import usePersons from './hooks/usePersons';
+import { getErrorMessage } from './utils/errors';
+import { stripFinnishLeadingZero } from './utils/validation';
 
 const App = () => {
   const [newFirstName, setNewFirstName] = useState('');
@@ -55,24 +57,22 @@ const App = () => {
   const handleAddName = useCallback(
     async (event) => {
       event.preventDefault();
-      const fullPhoneNumber = `${newCountryCode} ${newNumber}`;
+      const localNumber = stripFinnishLeadingZero(
+        newNumber.trim(),
+        newCountryCode,
+      );
       const nameObject = {
         firstName: newFirstName.trim(),
         lastName: newLastName.trim(),
-        number: fullPhoneNumber,
+        number: `${newCountryCode} ${localNumber}`,
       };
 
       try {
-        await addPerson(nameObject);
+        // Keep the input intact when the request fails or the user cancels
+        const added = await addPerson(nameObject);
+        if (added) resetForm();
       } catch (error) {
-        const errorMessage =
-          error.response?.data?.error ||
-          error.response?.data?.details?.join(', ') ||
-          error.message ||
-          'An unexpected error occurred';
-        showNotification(errorMessage, true);
-      } finally {
-        resetForm();
+        showNotification(getErrorMessage(error), true);
       }
     },
     [
@@ -88,12 +88,7 @@ const App = () => {
 
   const handleNumberChange = useCallback(
     (e) => {
-      let value = e.target.value;
-      // Finnish number normalization: remove leading zero from mobile numbers
-      if (newCountryCode === '+358' && /^0[4-5]/.test(value)) {
-        value = value.substring(1);
-      }
-      setNewNumber(value);
+      setNewNumber(stripFinnishLeadingZero(e.target.value, newCountryCode));
     },
     [newCountryCode],
   );

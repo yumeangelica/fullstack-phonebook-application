@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import useConfirm from '../hooks/useConfirm';
 import {
   countryCodes,
@@ -18,6 +19,17 @@ const NewPersonForm = ({
   handleCountryCodeChange,
 }) => {
   const confirm = useConfirm();
+  const [submitting, setSubmitting] = useState(false);
+
+  // Disable the submit button while the request is in flight
+  const handleSubmit = async (event) => {
+    setSubmitting(true);
+    try {
+      await addName(event);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const clearForm = async () => {
     const hasContent = newFirstName || newLastName || newNumber;
@@ -56,7 +68,7 @@ const NewPersonForm = ({
     <div className="form-container">
       <div className="form-content">
         <h2 className="form-title">Add a new contact</h2>
-        <form onSubmit={addName} className="new-person-form">
+        <form onSubmit={handleSubmit} className="new-person-form">
           <div>
             <label htmlFor="firstName" className="form-label">
               First Name:
@@ -88,11 +100,14 @@ const NewPersonForm = ({
               }
               className={`form-input ${showFirstNameFeedback ? (firstNameValidation.isValid ? 'is-valid' : 'is-invalid') : ''}`}
             />
-            {showFirstNameFeedback && !firstNameValidation.isValid && (
-              <div id="firstName-error" className="validation-message error">
-                {firstNameValidation.message}
-              </div>
-            )}
+            {/* Always rendered so screen readers announce message changes */}
+            <div id="firstName-error" aria-live="polite">
+              {showFirstNameFeedback && !firstNameValidation.isValid && (
+                <div className="validation-message error">
+                  {firstNameValidation.message}
+                </div>
+              )}
+            </div>
 
             <label htmlFor="lastName" className="form-label">
               Last Name:
@@ -124,11 +139,13 @@ const NewPersonForm = ({
               }
               className={`form-input ${showLastNameFeedback ? (lastNameValidation.isValid ? 'is-valid' : 'is-invalid') : ''}`}
             />
-            {showLastNameFeedback && !lastNameValidation.isValid && (
-              <div id="lastName-error" className="validation-message error">
-                {lastNameValidation.message}
-              </div>
-            )}
+            <div id="lastName-error" aria-live="polite">
+              {showLastNameFeedback && !lastNameValidation.isValid && (
+                <div className="validation-message error">
+                  {lastNameValidation.message}
+                </div>
+              )}
+            </div>
 
             <label htmlFor="phoneNumber" className="form-label">
               Country & Number:
@@ -179,22 +196,36 @@ const NewPersonForm = ({
                 )}
               </div>
             </div>
-            {showNumberFeedback && !numberValidation.isValid && (
-              <div id="number-error" className="validation-message error">
-                {numberValidation.message}
-              </div>
-            )}
+            <div id="number-error" aria-live="polite">
+              {showNumberFeedback && !numberValidation.isValid && (
+                <div className="validation-message error">
+                  {numberValidation.message}
+                </div>
+              )}
+            </div>
 
             <div className="form-buttons">
               <button
                 type="submit"
-                className={`submit-btn ${!isFormValid ? 'disabled' : ''}`}
-                disabled={!isFormValid}
+                className={`submit-btn ${!isFormValid || submitting ? 'disabled' : ''}`}
+                disabled={!isFormValid || submitting}
               >
-                Add
+                {submitting ? (
+                  <>
+                    <span className="loading-spinner" aria-hidden="true" />
+                    <span className="sr-only">Loading</span>
+                  </>
+                ) : (
+                  'Add'
+                )}
               </button>
 
-              <button type="button" className="clear-btn" onClick={clearForm}>
+              <button
+                type="button"
+                className="clear-btn"
+                onClick={clearForm}
+                disabled={submitting}
+              >
                 Clear
               </button>
             </div>

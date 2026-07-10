@@ -9,10 +9,10 @@ const validateName = (name, fieldLabel) => {
   const trimmedName = name.trim();
   if (!trimmedName)
     return { isValid: false, message: `${fieldLabel} is required` };
-  if (trimmedName.length < 3)
+  if (trimmedName.length < 2)
     return {
       isValid: false,
-      message: `${fieldLabel} must be at least 3 characters`,
+      message: `${fieldLabel} must be at least 2 characters`,
     };
   if (trimmedName.length > 50)
     return {
@@ -135,18 +135,21 @@ export const countryCodes = [
 
 const VALID_PHONE_TYPES = ['MOBILE', 'FIXED_LINE_OR_MOBILE', 'FIXED_LINE'];
 
+// Strip leading 0 from Finnish mobile numbers entered in local format
+export const stripFinnishLeadingZero = (number, countryCode) => {
+  if (countryCode === '+358' && /^0[4-5]/.test(number)) {
+    return number.substring(1);
+  }
+  return number;
+};
+
 export const validatePhoneNumber = (number, countryCode) => {
   if (!number.trim())
     return { isValid: false, message: 'Phone number is required' };
 
   const country =
     countryCodes.find((c) => c.code === countryCode) || countryCodes[0];
-  let trimmedNumber = number.trim();
-
-  // Strip leading 0 for Finnish mobile numbers (common local format)
-  if (countryCode === '+358' && /^0[4-5]/.test(trimmedNumber)) {
-    trimmedNumber = trimmedNumber.substring(1);
-  }
+  const trimmedNumber = stripFinnishLeadingZero(number.trim(), countryCode);
 
   try {
     const fullNumber = `${countryCode} ${trimmedNumber}`;

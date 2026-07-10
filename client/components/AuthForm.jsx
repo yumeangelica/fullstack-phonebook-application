@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { getErrorMessage } from '../utils/errors';
 
 const AuthForm = ({ onLogin, onRegister, showNotification }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -51,11 +52,7 @@ const AuthForm = ({ onLogin, onRegister, showNotification }) => {
           await onRegister(username.trim(), password);
         }
       } catch (error) {
-        const errorMessage =
-          error.response?.data?.error ||
-          error.message ||
-          'An unexpected error occurred';
-        showNotification(errorMessage, true);
+        showNotification(getErrorMessage(error), true);
       } finally {
         setSubmitting(false);
       }

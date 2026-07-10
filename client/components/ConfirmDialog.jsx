@@ -40,8 +40,11 @@ const ConfirmDialog = ({
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      // Return focus to the element that opened the dialog
-      previouslyFocused?.focus?.();
+      // Return focus to the element that opened the dialog, unless it was
+      // removed while the dialog was open (e.g. a deleted table row)
+      if (previouslyFocused && document.contains(previouslyFocused)) {
+        previouslyFocused.focus?.();
+      }
     };
   }, [onCancel]);
 
