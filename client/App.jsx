@@ -117,7 +117,9 @@ const App = () => {
     return (
       <div className="container">
         <h1>Phonebook</h1>
-        <p className="auth-loading-text">Loading...</p>
+        <main>
+          <p className="auth-loading-text">Loading...</p>
+        </main>
       </div>
     );
   }
@@ -130,11 +132,13 @@ const App = () => {
           notificationMessage={message}
           errorHappened={isError}
         />
-        <AuthForm
-          onLogin={login}
-          onRegister={register}
-          showNotification={showNotification}
-        />
+        <main>
+          <AuthForm
+            onLogin={login}
+            onRegister={register}
+            showNotification={showNotification}
+          />
+        </main>
         <Footer />
       </div>
     );
@@ -142,6 +146,9 @@ const App = () => {
 
   return (
     <div className="container">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <h1>Phonebook</h1>
       <UserHeader
         username={user.username}
@@ -153,7 +160,7 @@ const App = () => {
         errorHappened={isError}
       />
 
-      <main>
+      <main id="main-content">
         <Filter newFilter={newFilter} onFilterChange={setNewFilter} />
 
         <div className="toggle-form-container">
@@ -161,6 +168,7 @@ const App = () => {
             type="button"
             className="actionbtn"
             onClick={() => setIsFormVisible(!isFormVisible)}
+            aria-expanded={isFormVisible}
           >
             {isFormVisible
               ? 'Close new person form'

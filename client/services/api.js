@@ -10,8 +10,6 @@ const setToken = (newToken) => {
   token = newToken;
 };
 
-const getToken = () => token;
-
 const clearToken = () => {
   token = null;
 };
@@ -87,7 +85,6 @@ const removePerson = (id) =>
 
 export default {
   setToken,
-  getToken,
   clearToken,
   login,
   register,

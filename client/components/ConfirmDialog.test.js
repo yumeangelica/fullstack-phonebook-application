@@ -63,6 +63,45 @@ describe('<ConfirmDialog />', () => {
     await cleanup();
   });
 
+  it('traps focus inside the dialog when tabbing past the last button', async () => {
+    const { container, cleanup } = await renderDialog({
+      onConfirm: () => {},
+      onCancel: () => {},
+    });
+
+    const confirmButton = container.querySelector('.confirm-dialog-confirm');
+    const cancelButton = container.querySelector('.confirm-dialog-cancel');
+
+    // Confirm button is autofocused and is the last focusable element
+    assert.strictEqual(document.activeElement, confirmButton);
+
+    await act(async () => {
+      document.dispatchEvent(
+        new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
+      );
+    });
+
+    assert.strictEqual(document.activeElement, cancelButton);
+    await cleanup();
+  });
+
+  it('returns focus to the previously focused element on close', async () => {
+    const trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+
+    const { cleanup } = await renderDialog({
+      onConfirm: () => {},
+      onCancel: () => {},
+    });
+
+    assert.notStrictEqual(document.activeElement, trigger);
+    await cleanup();
+
+    assert.strictEqual(document.activeElement, trigger);
+    document.body.removeChild(trigger);
+  });
+
   it('calls onCancel when Escape is pressed', async () => {
     let cancelled = false;
     const { cleanup } = await renderDialog({

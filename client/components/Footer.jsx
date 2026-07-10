@@ -2,9 +2,13 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="footer">
-      <p>© 2023 - {currentYear} yumeangelica.github.io. All Rights Reserved.</p>
-    </div>
+    <footer className="footer">
+      <p>
+        © 2023 - {currentYear}{' '}
+        <a href="https://yumeangelica.github.io">yumeangelica.github.io</a>. All
+        Rights Reserved.
+      </p>
+    </footer>
   );
 };
 

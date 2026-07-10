@@ -17,10 +17,17 @@ Originally created for the Full Stack Open course in 2023, significantly moderni
 - Real-time form validation with visual feedback
 - International phone number validation with country codes
 - Finnish phone number normalization (removes leading zero)
-- Responsive design for desktop and mobile
-- Search and filter functionality
-- Pagination for large contact lists
+- Mobile-first responsive design with self-hosted Comfortaa font
+- Accessible UI — skip link, screen-reader labels, keyboard focus states, reduced-motion support
+- Search and filter functionality (instant client-side filtering)
+- REST API with pagination and search support (`page`/`limit`/`search` query params)
 - Comprehensive error handling
+
+## Screenshots
+
+| Mobile | Desktop |
+| --- | --- |
+| ![Mobile view](docs/screenshot-mobile.png) | ![Desktop view](docs/screenshot-desktop.png) |
 
 ## Tech Stack
 
@@ -41,7 +48,7 @@ Originally created for the Full Stack Open course in 2023, significantly moderni
 ### Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/yumeangelica/fullstack-phonebook-application.git
 cd fullstack-phonebook-application
 bun install
 ```
@@ -146,11 +153,12 @@ GET    /live               - Liveness probe
 │   ├── utils/           # Validation utilities
 │   └── test-setup.js    # jsdom setup for frontend tests
 ├── server/              # Express backend
-│   ├── controllers/     # Route handlers (auth, api, health, index)
+│   ├── controllers/     # Route handlers (auth, api, health)
 │   ├── middleware/      # Auth, error handling, logging, security
 │   ├── models/          # Mongoose models (User, Person)
 │   ├── tests/           # Backend tests (supertest)
 │   └── utils/           # Config, database, and auth utilities
+├── public/              # Static assets served as-is (self-hosted fonts)
 ├── biome.json           # Biome lint + format config
 ├── vite.config.js       # Vite build & dev server config
 ├── index.html           # HTML template

@@ -7,7 +7,6 @@ const {
   createRateLimiter,
   securityHeaders,
 } = require('./middleware/index');
-const indexRouter = require('./controllers/indexController');
 const apiRouter = require('./controllers/apiController');
 const authRouter = require('./controllers/authController');
 const healthRouter = require('./controllers/healthController');
@@ -38,7 +37,6 @@ app.use(httpLogger);
 app.use('/api/auth', authRouter);
 app.use('/api', apiRouter);
 app.use('/', healthRouter);
-app.use('/', indexRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

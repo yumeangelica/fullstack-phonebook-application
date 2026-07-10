@@ -2,6 +2,7 @@ const healthRouter = require('express').Router();
 const mongoose = require('mongoose');
 const Person = require('../models/personModel');
 const os = require('node:os');
+const { version } = require('../../package.json');
 
 // Health check endpoint
 healthRouter.get('/health', async (req, res) => {
@@ -28,7 +29,7 @@ healthRouter.get('/health', async (req, res) => {
       status: dbStatus === 1 && dbOperational ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      version: process.env.npm_package_version || '1.0.0',
+      version,
       node: process.version,
       environment: process.env.NODE_ENV || 'development',
       database: {

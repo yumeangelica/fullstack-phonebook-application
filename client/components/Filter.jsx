@@ -13,7 +13,7 @@ const Filter = ({ newFilter, onFilterChange }) => {
               className="filter-input"
               onChange={(e) => onFilterChange(e.target.value)}
               value={newFilter}
-              placeholder="Search by name or phone number..."
+              placeholder="Search by name or number..."
               aria-describedby="filter-help"
             />
             {newFilter && (

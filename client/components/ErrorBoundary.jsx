@@ -20,16 +20,18 @@ class ErrorBoundary extends Component {
       return (
         <div className="container">
           <h1>Phonebook</h1>
-          <div className="error-boundary" role="alert">
-            <p>Something went wrong while rendering the app.</p>
-            <button
-              type="button"
-              className="actionbtn"
-              onClick={this.handleReload}
-            >
-              Reload page
-            </button>
-          </div>
+          <main>
+            <div className="error-boundary" role="alert">
+              <p>Something went wrong while rendering the app.</p>
+              <button
+                type="button"
+                className="actionbtn"
+                onClick={this.handleReload}
+              >
+                Reload page
+              </button>
+            </div>
+          </main>
         </div>
       );
     }
