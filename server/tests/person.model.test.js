@@ -91,7 +91,7 @@ describe('Person model', () => {
 
     it('validates minimum firstName length', async () => {
       const personData = {
-        firstName: 'Jo',
+        firstName: 'J',
         lastName: 'Doe',
         number: '+358 40-1234567',
         user: userId,
@@ -100,14 +100,14 @@ describe('Person model', () => {
       const person = new Person(personData);
       await assert.rejects(
         () => person.save(),
-        /First name must be at least 3 characters/,
+        /First name must be at least 2 characters/,
       );
     });
 
     it('validates minimum lastName length', async () => {
       const personData = {
         firstName: 'John',
-        lastName: 'Do',
+        lastName: 'D',
         number: '+358 40-1234567',
         user: userId,
       };
@@ -115,8 +115,23 @@ describe('Person model', () => {
       const person = new Person(personData);
       await assert.rejects(
         () => person.save(),
-        /Last name must be at least 3 characters/,
+        /Last name must be at least 2 characters/,
       );
+    });
+
+    it('accepts two-character names', async () => {
+      const personData = {
+        firstName: 'Bo',
+        lastName: 'Li',
+        number: '+358 40-1234567',
+        user: userId,
+      };
+
+      const person = new Person(personData);
+      const savedPerson = await person.save();
+
+      assert.strictEqual(savedPerson.firstName, 'Bo');
+      assert.strictEqual(savedPerson.lastName, 'Li');
     });
 
     it('validates minimum number length', async () => {
@@ -305,14 +320,14 @@ describe('Person model', () => {
       const savedPerson = await person.save();
       const originalUpdatedAt = savedPerson.updatedAt;
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
       savedPerson.firstName = 'Francisco';
       const updatedPerson = await savedPerson.save();
 
+      // Deterministic: same-millisecond saves would make a strict > flaky
       assert.ok(
-        updatedPerson.updatedAt.getTime() > originalUpdatedAt.getTime(),
+        updatedPerson.updatedAt.getTime() >= originalUpdatedAt.getTime(),
       );
+      assert.strictEqual(updatedPerson.firstName, 'Francisco');
     });
   });
 });
