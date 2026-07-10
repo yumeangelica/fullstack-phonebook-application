@@ -9,6 +9,7 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 const inProduction = process.env.NODE_ENV === 'production';
+const inTest = process.env.NODE_ENV === 'test';
 
 // JWT_SECRET must be provided explicitly in production. Outside production we
 // fall back to a clearly-unsafe development value and warn, so local setup and
@@ -32,6 +33,7 @@ if (inProduction) {
 
 module.exports = {
   inProduction,
+  inTest,
   MONGODB_URI,
   PORT,
   ALLOWED_ORIGINS,

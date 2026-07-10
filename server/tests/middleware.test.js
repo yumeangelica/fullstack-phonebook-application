@@ -1,6 +1,10 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
-const { createRateLimiter } = require('../middleware/index');
+const { SignJWT } = require('jose');
+const { requireAuth } = require('../middleware/auth');
+const { createRateLimiter, errorHandler } = require('../middleware/index');
+const { generateToken } = require('../utils/auth');
+const { JWT_SECRET } = require('../utils/config');
 
 const createMockRes = () => {
   const res = { statusCode: null, body: null };
@@ -14,6 +18,8 @@ const createMockRes = () => {
   };
   return res;
 };
+
+const createMockReq = (authorization) => ({ get: () => authorization });
 
 describe('createRateLimiter', () => {
   it('allows requests under the limit', () => {
@@ -76,5 +82,96 @@ describe('createRateLimiter', () => {
     });
 
     assert.strictEqual(nextCalled, true);
+  });
+});
+
+describe('requireAuth', () => {
+  it('returns 401 when the authorization header is missing', async () => {
+    const res = createMockRes();
+    let nextCalled = false;
+
+    await requireAuth(createMockReq(undefined), res, () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, false);
+    assert.strictEqual(res.statusCode, 401);
+    assert.strictEqual(res.body.error, 'Token missing');
+  });
+
+  it('returns 401 when the scheme is not bearer', async () => {
+    const res = createMockRes();
+    let nextCalled = false;
+
+    await requireAuth(createMockReq('Basic dXNlcjpwYXNz'), res, () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, false);
+    assert.strictEqual(res.statusCode, 401);
+    assert.strictEqual(res.body.error, 'Token missing');
+  });
+
+  it('returns 401 for a malformed token', async () => {
+    const res = createMockRes();
+    let nextCalled = false;
+
+    await requireAuth(createMockReq('Bearer not-a-jwt'), res, () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, false);
+    assert.strictEqual(res.statusCode, 401);
+    assert.strictEqual(res.body.error, 'Token invalid or expired');
+  });
+
+  it('returns 401 for an expired token', async () => {
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    const expiredToken = await new SignJWT({
+      id: 'user-id-123',
+      username: 'ada',
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt(nowInSeconds - 7200)
+      .setExpirationTime(nowInSeconds - 3600)
+      .sign(new TextEncoder().encode(JWT_SECRET));
+
+    const res = createMockRes();
+    let nextCalled = false;
+
+    await requireAuth(createMockReq(`Bearer ${expiredToken}`), res, () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, false);
+    assert.strictEqual(res.statusCode, 401);
+    assert.strictEqual(res.body.error, 'Token invalid or expired');
+  });
+
+  it('sets request.user and calls next for a valid token', async () => {
+    const token = await generateToken('user-id-123', 'ada');
+    const req = createMockReq(`Bearer ${token}`);
+    const res = createMockRes();
+    let nextCalled = false;
+
+    await requireAuth(req, res, () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, true);
+    assert.strictEqual(res.statusCode, null);
+    assert.deepStrictEqual(req.user, { id: 'user-id-123', username: 'ada' });
+  });
+});
+
+describe('errorHandler', () => {
+  it('responds 500 without internal details for unexpected errors', () => {
+    const res = createMockRes();
+
+    errorHandler(new Error('database exploded'), {}, res, () => {});
+
+    assert.strictEqual(res.statusCode, 500);
+    // Outside development the body must not leak the error message
+    assert.deepStrictEqual(res.body, { error: 'Internal server error' });
   });
 });

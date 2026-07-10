@@ -83,7 +83,9 @@ const httpLogger = (request, response, next) => {
   next();
 };
 
-// Simple in-memory rate limiting middleware for API protection
+// Simple in-memory rate limiting middleware for API protection.
+// Counters are per-process, so limits apply per instance; a shared store
+// (e.g. Redis) would be needed when scaling beyond a single instance.
 const createRateLimiter = (windowMs = 15 * 60 * 1000, max = 100) => {
   const requests = new Map();
 
