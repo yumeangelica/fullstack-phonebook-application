@@ -1,6 +1,11 @@
 // Express requires 4 params to identify error-handling middleware
 const errorHandler = (error, request, response, _next) => {
-  console.error(`Error: ${error.message}`);
+  // Full messages only in development: they can contain contact PII
+  if (process.env.NODE_ENV === 'development') {
+    console.error(`Error: ${error.name}: ${error.message}`);
+  } else {
+    console.error(`Error: ${error.name}`);
+  }
 
   // MongoDB validation errors - extract and format user-friendly messages
   if (error.name === 'ValidationError') {
@@ -20,8 +25,7 @@ const errorHandler = (error, request, response, _next) => {
 
   // MongoDB duplicate key errors - handle unique constraint violations
   if (error.code === 11000) {
-    const field = Object.keys(error.keyValue)[0];
-    const value = error.keyValue[field];
+    const field = Object.keys(error.keyValue || {})[0];
 
     if (field === 'username') {
       return response.status(409).json({
@@ -35,15 +39,21 @@ const errorHandler = (error, request, response, _next) => {
       });
     }
 
-    return response.status(409).json({
-      error: `${field} '${value}' already exists`,
-    });
-  }
+    // First key of the compound name index (firstName, lastName, user)
+    if (field === 'firstName') {
+      return response.status(409).json({
+        error: 'Person with this name already exists',
+      });
+    }
 
-  // Rate limiting errors
-  if (error.status === 429) {
-    return response.status(429).json({
-      error: 'Too many requests, please try again later',
+    if (!field) {
+      return response.status(409).json({
+        error: 'Duplicate value',
+      });
+    }
+
+    return response.status(409).json({
+      error: `${field} '${error.keyValue[field]}' already exists`,
     });
   }
 

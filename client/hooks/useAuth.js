@@ -9,6 +9,9 @@ const useAuth = () => {
 
   // Check localStorage on mount
   useEffect(() => {
+    // Ignore stale responses if the component unmounts mid-request
+    let ignore = false;
+
     const checkAuth = async () => {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (!stored) {
@@ -26,20 +29,27 @@ const useAuth = () => {
 
         // Validate token by calling /me
         const response = await apiService.getMe();
-        const userData = { ...response.data, token: parsed.token };
+        if (ignore) return;
 
+        const userData = { ...response.data, token: parsed.token };
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
         setUser(userData);
       } catch (_error) {
-        // Token expired or invalid
-        window.localStorage.removeItem(STORAGE_KEY);
-        apiService.clearToken();
+        if (!ignore) {
+          // Token expired or invalid
+          window.localStorage.removeItem(STORAGE_KEY);
+          apiService.clearToken();
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
 
     checkAuth();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const login = useCallback(async (username, password) => {

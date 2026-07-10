@@ -14,27 +14,39 @@ const usePersons = (showNotification, user) => {
       return;
     }
 
+    // Ignore stale responses if the user logs out or changes mid-request
+    let ignore = false;
+
     const fetchPersons = async () => {
       try {
         setLoading(true);
         const response = await apiService.getAllPersons();
-        setPersons(response.data.persons || []);
+        if (!ignore) setPersons(response.data.persons || []);
       } catch (error) {
-        console.error('Error fetching persons:', error.message);
-        showNotification('Failed to load contacts', true);
+        if (!ignore) {
+          console.error('Error fetching persons:', error.message);
+          showNotification('Failed to load contacts', true);
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
     fetchPersons();
+
+    return () => {
+      ignore = true;
+    };
   }, [user, showNotification]);
 
+  // Resolves to true when a person was saved, false when the user cancelled
   const addPerson = useCallback(
     async (personData) => {
       const { firstName, lastName } = personData;
+      // Case-insensitive, consistent with the contact filter
       const existingPerson = persons.find(
         (person) =>
-          person.firstName === firstName && person.lastName === lastName,
+          person.firstName.toLowerCase() === firstName.toLowerCase() &&
+          person.lastName.toLowerCase() === lastName.toLowerCase(),
       );
 
       if (existingPerson) {
@@ -42,7 +54,7 @@ const usePersons = (showNotification, user) => {
           message: `${firstName} ${lastName} is already added to phonebook, replace the old number with a new one?`,
           confirmLabel: 'Replace',
         });
-        if (!confirmUpdate) return;
+        if (!confirmUpdate) return false;
 
         const response = await apiService.updatePerson(
           existingPerson.id,
@@ -57,6 +69,8 @@ const usePersons = (showNotification, user) => {
         setPersons((prev) => [...prev, response.data]);
         showNotification(`Added ${firstName} ${lastName}`, false);
       }
+
+      return true;
     },
     [persons, showNotification, confirm],
   );

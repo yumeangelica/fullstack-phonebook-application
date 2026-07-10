@@ -14,18 +14,27 @@ const { inProduction, ALLOWED_ORIGINS } = require('./utils/config');
 const path = require('node:path');
 const app = express();
 
+// Behind a reverse proxy in production; needed so req.ip reflects the client
+// instead of the proxy (rate limiting is keyed on req.ip)
+if (inProduction) {
+  app.set('trust proxy', 1);
+}
+
 // Security headers
 app.use(securityHeaders);
 
 app.use(
   cors({
     origin: ALLOWED_ORIGINS,
-    credentials: true,
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 
-// Rate limiting for API routes
+// Rate limiting for API routes, with a stricter limit on credential endpoints
+app.use(
+  ['/api/auth/login', '/api/auth/register'],
+  createRateLimiter(15 * 60 * 1000, 30),
+);
 app.use('/api', createRateLimiter());
 
 if (inProduction) {

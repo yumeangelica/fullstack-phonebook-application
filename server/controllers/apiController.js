@@ -84,7 +84,7 @@ apiRouter.get('/persons/:id', async (request, response, next) => {
     if (person) {
       response.json(person);
     } else {
-      response.status(404).end();
+      response.status(404).json({ error: 'Person not found' });
     }
   } catch (error) {
     next(error);
@@ -93,20 +93,25 @@ apiRouter.get('/persons/:id', async (request, response, next) => {
 
 // Add a new person (scoped to user)
 apiRouter.post('/persons', async (request, response, next) => {
-  let { firstName, lastName, number } = request.body;
+  const { firstName, lastName, number } = request.body;
 
-  if (!firstName || !lastName || !number) {
+  if (
+    typeof firstName !== 'string' ||
+    typeof lastName !== 'string' ||
+    typeof number !== 'string' ||
+    !firstName.trim() ||
+    !lastName.trim() ||
+    !number.trim()
+  ) {
     return response.status(400).json({
       error: 'firstName, lastName, and number are required',
     });
   }
 
-  number = normalizePhoneNumber(normalizeFinnishNumber(number));
-
   const person = new Person({
     firstName,
     lastName,
-    number,
+    number: normalizePhoneNumber(normalizeFinnishNumber(number)),
     user: request.user.id,
   });
 
@@ -122,6 +127,16 @@ apiRouter.post('/persons', async (request, response, next) => {
 apiRouter.put('/persons/:id', async (request, response, next) => {
   const { firstName, lastName, number } = request.body;
 
+  if (
+    (firstName !== undefined && typeof firstName !== 'string') ||
+    (lastName !== undefined && typeof lastName !== 'string') ||
+    (number !== undefined && typeof number !== 'string')
+  ) {
+    return response.status(400).json({
+      error: 'firstName, lastName, and number must be strings',
+    });
+  }
+
   const updateData = {};
   if (firstName) updateData.firstName = firstName;
   if (lastName) updateData.lastName = lastName;
@@ -130,23 +145,9 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
     updateData.number = normalizePhoneNumber(normalizeFinnishNumber(number));
   }
 
+  // Duplicate names are rejected by the unique index (firstName, lastName,
+  // user) and mapped to 409 in the error handler
   try {
-    // Check if updating to existing name combination (excluding current person, scoped to user)
-    if (firstName && lastName) {
-      const existingPerson = await Person.findOne({
-        firstName,
-        lastName,
-        user: request.user.id,
-        _id: { $ne: request.params.id },
-      });
-
-      if (existingPerson) {
-        return response.status(409).json({
-          error: 'Person with this name already exists',
-        });
-      }
-    }
-
     const updatedPerson = await Person.findOneAndUpdate(
       { _id: request.params.id, user: request.user.id },
       updateData,
@@ -155,7 +156,7 @@ apiRouter.put('/persons/:id', async (request, response, next) => {
     if (updatedPerson) {
       response.json(updatedPerson);
     } else {
-      response.status(404).end();
+      response.status(404).json({ error: 'Person not found' });
     }
   } catch (error) {
     next(error);
@@ -172,7 +173,7 @@ apiRouter.delete('/persons/:id', async (request, response, next) => {
     if (deletedPerson) {
       response.status(204).end();
     } else {
-      response.status(404).json({ error: 'person not found' });
+      response.status(404).json({ error: 'Person not found' });
     }
   } catch (error) {
     next(error);
@@ -190,7 +191,7 @@ apiRouter.get('/stats', async (request, response, next) => {
     response.json({
       totalPersons,
       recentPersons,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     next(error);

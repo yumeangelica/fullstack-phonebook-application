@@ -1,10 +1,12 @@
 const { describe, it, before, after, beforeEach } = require('node:test');
 const assert = require('node:assert');
 const supertest = require('supertest');
+const { SignJWT } = require('jose');
 const { connectDB, disconnectDB } = require('./setup');
 const app = require('../app');
 const User = require('../models/userModel');
 const Person = require('../models/personModel');
+const { JWT_SECRET } = require('../utils/config');
 const helper = require('./test-helper');
 
 const api = supertest(app);
@@ -176,6 +178,27 @@ describe('Auth API', () => {
         .get('/api/auth/me')
         .set('Authorization', 'Bearer invalidtoken')
         .expect(401);
+    });
+
+    it('returns 401 with expired token', async () => {
+      const { user } = await helper.createTestUser();
+
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      const expiredToken = await new SignJWT({
+        id: user.id,
+        username: user.username,
+      })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt(nowInSeconds - 7200)
+        .setExpirationTime(nowInSeconds - 3600)
+        .sign(new TextEncoder().encode(JWT_SECRET));
+
+      const result = await api
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${expiredToken}`)
+        .expect(401);
+
+      assert.ok(result.body.error.includes('expired'));
     });
   });
 

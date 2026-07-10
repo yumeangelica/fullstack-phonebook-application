@@ -222,6 +222,38 @@ describe('Persons API', () => {
       assert.ok(result.body.error.includes('required'));
     });
 
+    it('returns 400 if fields are not strings', async () => {
+      const newPerson = {
+        firstName: ['Alice'],
+        lastName: 'Cooper',
+        number: 12345,
+      };
+
+      const result = await api
+        .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newPerson)
+        .expect(400);
+
+      assert.ok(result.body.error.includes('required'));
+    });
+
+    it('normalizes finnish numbers by removing the leading zero', async () => {
+      const newPerson = {
+        firstName: 'Maija',
+        lastName: 'Virtanen',
+        number: '+358 040 5551234',
+      };
+
+      const result = await api
+        .post('/api/persons')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newPerson)
+        .expect(201);
+
+      assert.strictEqual(result.body.number, '+358 40 5551234');
+    });
+
     it('returns 400 if number is too short', async () => {
       const newPerson = {
         firstName: 'Alice',
@@ -308,6 +340,32 @@ describe('Persons API', () => {
         .set('Authorization', `Bearer ${token}`)
         .send(updatedData)
         .expect(404);
+    });
+
+    it('returns 400 if fields are not strings', async () => {
+      const personsAtStart = await helper.personsInDb();
+      const personToUpdate = personsAtStart[0];
+
+      const result = await api
+        .put(`/api/persons/${personToUpdate.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ number: 12345 })
+        .expect(400);
+
+      assert.ok(result.body.error.includes('must be strings'));
+    });
+
+    it('returns 409 when updating to another persons name', async () => {
+      const personsAtStart = await helper.personsInDb();
+      const [first, second] = personsAtStart;
+
+      const result = await api
+        .put(`/api/persons/${second.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ firstName: first.firstName, lastName: first.lastName })
+        .expect(409);
+
+      assert.ok(result.body.error.includes('already exists'));
     });
   });
 

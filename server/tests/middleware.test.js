@@ -1,0 +1,80 @@
+const { describe, it } = require('node:test');
+const assert = require('node:assert');
+const { createRateLimiter } = require('../middleware/index');
+
+const createMockRes = () => {
+  const res = { statusCode: null, body: null };
+  res.status = (code) => {
+    res.statusCode = code;
+    return res;
+  };
+  res.json = (payload) => {
+    res.body = payload;
+    return res;
+  };
+  return res;
+};
+
+describe('createRateLimiter', () => {
+  it('allows requests under the limit', () => {
+    const limiter = createRateLimiter(60 * 1000, 2);
+    const req = { ip: '198.51.100.1' };
+    let nextCalls = 0;
+
+    limiter(req, createMockRes(), () => nextCalls++);
+    limiter(req, createMockRes(), () => nextCalls++);
+
+    assert.strictEqual(nextCalls, 2);
+  });
+
+  it('returns 429 with retryAfter once the limit is exceeded', () => {
+    const limiter = createRateLimiter(60 * 1000, 1);
+    const req = { ip: '198.51.100.2' };
+
+    limiter(req, createMockRes(), () => {});
+
+    const res = createMockRes();
+    let nextCalled = false;
+    limiter(req, res, () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, false);
+    assert.strictEqual(res.statusCode, 429);
+    assert.strictEqual(res.body.error, 'Too many requests');
+    assert.strictEqual(res.body.retryAfter, 60);
+  });
+
+  it('tracks limits per client ip', () => {
+    const limiter = createRateLimiter(60 * 1000, 1);
+
+    limiter({ ip: '198.51.100.3' }, createMockRes(), () => {});
+
+    let nextCalled = false;
+    limiter({ ip: '198.51.100.4' }, createMockRes(), () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, true);
+  });
+
+  it('allows requests again after the window has passed', () => {
+    const limiter = createRateLimiter(1, 1);
+    const req = { ip: '198.51.100.5' };
+
+    limiter(req, createMockRes(), () => {});
+
+    // Window is 1ms; wait for it to expire deterministically
+    const waitUntil = Date.now() + 5;
+    while (Date.now() < waitUntil) {
+      // busy-wait: the limiter compares plain timestamps
+    }
+
+    let nextCalled = false;
+    limiter(req, createMockRes(), () => {
+      nextCalled = true;
+    });
+
+    assert.strictEqual(nextCalled, true);
+  });
+});

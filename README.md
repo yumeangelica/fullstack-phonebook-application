@@ -1,7 +1,7 @@
 # Fullstack Phonebook Application
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Bun](https://img.shields.io/badge/Bun-1.x-black.svg)
+![Bun](https://img.shields.io/badge/Bun-%3E%3D1.3-black.svg)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF.svg)
 ![Biome](https://img.shields.io/badge/Biome-2-60A5FA.svg)
 
@@ -62,10 +62,12 @@ cp .env.example .env
 ```
 
 ```
+NODE_ENV=development
 MONGODB_URI=your-mongodb-uri
 TEST_MONGODB_URI=your-test-mongodb-uri
 JWT_SECRET=your-secret-key
 PORT=5001
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```
 
 `JWT_SECRET` is required in production; the server refuses to start without a secure value.
@@ -139,7 +141,7 @@ GET    /live               - Liveness probe
 
 **Username:** 3-30 characters, lowercase letters, numbers, hyphens, underscores
 **Password:** Minimum 8 characters
-**Names:** 3-50 characters, letters/spaces/hyphens/apostrophes only, Unicode support
+**Names:** 2-50 characters, letters/spaces/hyphens/apostrophes only, Unicode support
 **Phone:** International format with country codes, real-world validation using libphonenumber-js
 
 ## Project Structure
