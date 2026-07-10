@@ -63,6 +63,7 @@ const NewPersonForm = ({
               {showFirstNameFeedback && (
                 <span
                   className={`validation-icon ${firstNameValidation.isValid ? 'valid' : 'invalid'}`}
+                  aria-hidden="true"
                 >
                   {firstNameValidation.isValid ? ' ✓' : ' ✗'}
                 </span>
@@ -98,6 +99,7 @@ const NewPersonForm = ({
               {showLastNameFeedback && (
                 <span
                   className={`validation-icon ${lastNameValidation.isValid ? 'valid' : 'invalid'}`}
+                  aria-hidden="true"
                 >
                   {lastNameValidation.isValid ? ' ✓' : ' ✗'}
                 </span>
@@ -170,6 +172,7 @@ const NewPersonForm = ({
                 {showNumberFeedback && (
                   <span
                     className={`validation-icon ${numberValidation.isValid ? 'valid' : 'invalid'}`}
+                    aria-hidden="true"
                   >
                     {numberValidation.isValid ? '✓' : '✗'}
                   </span>

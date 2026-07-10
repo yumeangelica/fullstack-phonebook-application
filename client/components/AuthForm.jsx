@@ -143,7 +143,10 @@ const AuthForm = ({ onLogin, onRegister, showNotification }) => {
             disabled={!isFormValid || submitting}
           >
             {submitting ? (
-              <span className="loading-spinner" />
+              <>
+                <span className="loading-spinner" aria-hidden="true" />
+                <span className="sr-only">Loading</span>
+              </>
             ) : isLoginMode ? (
               'Sign in'
             ) : (

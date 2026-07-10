@@ -64,14 +64,10 @@ const httpLogger = (request, response, next) => {
     const { statusCode } = response;
     const contentLength = response.get('content-length') || 0;
 
-    let line = `${method} ${url} ${statusCode} ${contentLength} - ${duration}ms`;
-
-    if ((method === 'POST' || method === 'PUT') && request.body) {
-      const { firstName, lastName, number } = request.body;
-      line += ` ${JSON.stringify({ firstName, lastName, number })}`;
-    }
-
-    console.log(line);
+    // Request bodies are never logged: they contain contact PII
+    console.log(
+      `${method} ${url} ${statusCode} ${contentLength} - ${duration}ms`,
+    );
   });
 
   next();
