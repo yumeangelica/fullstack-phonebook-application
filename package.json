@@ -1,6 +1,6 @@
 {
   "name": "fullstack-phonebook-application",
-  "version": "5.3.1",
+  "version": "5.3.2",
   "description": "A modern phonebook application with user authentication, real-time validation, international phone number support, and comprehensive testing. Originally created for Full Stack Open 2023, modernized in 2026.",
   "main": "index.js",
   "scripts": {
@@ -26,21 +26,21 @@
   "author": "yumeangelica",
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "^2.5.3",
-    "@vitejs/plugin-react": "^6.0.3",
-    "concurrently": "^10.0.3",
+    "@biomejs/biome": "^2.5.9",
+    "@vitejs/plugin-react": "^6.0.5",
+    "concurrently": "^10.0.5",
     "jsdom": "^29.1.1",
     "supertest": "^7.2.2",
-    "vite": "^8.1.4"
+    "vite": "^8.2.1"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "jose": "^6.2.3",
-    "libphonenumber-js": "^1.13.8",
-    "mongoose": "^9.7.4",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "jose": "^6.2.9",
+    "libphonenumber-js": "^1.13.11",
+    "mongoose": "^9.9.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   }
 }
